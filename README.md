@@ -4,6 +4,12 @@ A web app where the team logs time spent on tickets and follows each ticket
 through its phases, and where managers see everyone's progress and get a
 weekly report.
 
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Configuration reference](#configuration-reference)
+
 ## Features
 
 **For members**
@@ -39,11 +45,11 @@ The first account to sign up becomes an admin.
 
 ## Tech stack
 
-| Part     | Technology                                                       |
-| -------- | ---------------------------------------------------------------- |
+| Part     | Technology                                                        |
+| -------- | ----------------------------------------------------------------- |
 | Backend  | Go, using `net/http` with gorilla/mux and `database/sql` with pgx |
-| Database | PostgreSQL 17, running in Docker                                 |
-| Frontend | Next.js 16 (Pages Router), React 19, TypeScript, CSS Modules     |
+| Database | PostgreSQL 17, running in Docker                                  |
+| Frontend | Next.js 16 (Pages Router), React 19, TypeScript, CSS Modules      |
 
 ## Project structure
 
@@ -65,111 +71,58 @@ frontend/
 docker-compose.yml       The PostgreSQL database
 ```
 
+### How the parts connect
+
+```
+Browser ──► Frontend (Next.js, port 3001) ──/api/*──► Backend (Go, port 8000) ──► PostgreSQL (Docker, port 5432)
+```
+
+People only ever open the frontend. It forwards every `/api/*` request to
+the backend on the same machine, so only port **3001** needs to be reachable
+from the network. The backend and database stay internal.
+
 ## Getting started
 
-### Requirements
+You need Go 1.26+, Node.js 20.9+ with Yarn, and Docker
+(for example [Rancher Desktop](https://rancherdesktop.io/) on a Mac).
 
-- [Go](https://go.dev/dl/) 1.26 or later
-- [Node.js](https://nodejs.org/) 20.9 or later, and [Yarn](https://yarnpkg.com/)
-- Docker, for example through
-  [Rancher Desktop](https://rancherdesktop.io/) or Docker Desktop
+1. Create `.env` in the project root with `POSTGRES_PASSWORD=...`, then
+   start the database:
 
-### 1. Start the database
+   ```bash
+   docker compose up -d
+   ```
 
-Create a file called `.env` in the project root with a password of your
-choice:
+2. Start the backend, using the same password:
 
-```
-POSTGRES_PASSWORD=choose-a-password
-```
+   ```bash
+   export DATABASE_URL="postgres://ticket_timeline:YOUR_PASSWORD@localhost:5432/ticket_timeline?sslmode=disable"
+   go run ./cmd/server
+   ```
 
-`.env` is in `.gitignore`, so it is never committed.
+3. In another terminal, start the frontend:
 
-Then start PostgreSQL:
+   ```bash
+   cd frontend
+   yarn install
+   yarn dev
+   ```
 
-```bash
-docker compose up -d
-```
+4. Open http://localhost:3001.
 
-The database is only reachable from the same machine (`127.0.0.1:5432`).
-Its data is kept in a Docker volume, so it survives restarts.
-
-### 2. Start the backend
-
-The server reads its database address from the `DATABASE_URL` environment
-variable. Use the same password as in `.env`:
-
-```bash
-export DATABASE_URL="postgres://ticket_timeline:choose-a-password@localhost:5432/ticket_timeline?sslmode=disable"
-go run ./cmd/server
-```
-
-The API runs on http://localhost:8000. The database tables are created
-automatically on first start.
-
-### 3. Start the frontend
-
-In another terminal:
-
-```bash
-cd frontend
-yarn install
-yarn dev
-```
-
-Open http://localhost:3001 and sign up. The first account becomes the
-admin.
-
-The frontend forwards every `/api/*` request to the Go server, so the
-browser only ever talks to one address.
-
-## Configuration
-
-| Variable       | Used by  | Default                                                                | Purpose                                                       |
-| -------------- | -------- | ---------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `DATABASE_URL` | backend  | `postgres://postgres:postgres@localhost:5432/ticket_timeline?sslmode=disable` | PostgreSQL connection                                 |
-| `PORT`         | backend  | `8000`                                                                 | Port the API listens on                                       |
-| `COOKIE_SECURE`| backend  | off                                                                    | Set to `true` when the site is served over HTTPS              |
-| `BACKEND_URL`  | frontend | `http://localhost:8000`                                                | Where the frontend forwards `/api/*` requests                 |
-| `POSTGRES_PASSWORD` | docker compose | none (required)                                             | Database password, set in `.env`                              |
-
-## Running on a server
-
-```bash
-# Database
-docker compose up -d
-
-# Backend: build once, then run the binary
-go build -o server ./cmd/server
-DATABASE_URL="postgres://ticket_timeline:<password>@localhost:5432/ticket_timeline?sslmode=disable" ./server
-
-# Frontend: build once, then serve
-cd frontend
-yarn install
-yarn build
-yarn start          # serves on port 3001
-```
-
-Keep both processes running, for example with systemd or another process
-manager. If the site is served over HTTPS, set `COOKIE_SECURE=true` for the
-backend.
-
-### Moving existing data to another machine
-
-Back up from the old machine and restore on the new one with PostgreSQL's
-own tools, which are included in the database container:
-
-```bash
-# On the old machine
-docker compose exec db pg_dump -U ticket_timeline -Fc ticket_timeline > backup.dump
-
-# On the new machine, after `docker compose up -d`
-docker compose exec -T db pg_restore -U ticket_timeline -d ticket_timeline --clean --if-exists < backup.dump
-```
-
-## Development
+Checks to run before pushing:
 
 ```bash
 go test ./...                        # backend tests
 cd frontend && npx tsc --noEmit      # frontend type check
 ```
+
+## Configuration reference
+
+| Variable            | Used by        | Default                                 | Purpose                                                    |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------------------------- |
+| `POSTGRES_PASSWORD` | Docker         | none (required)                         | Database password                                          |
+| `DATABASE_URL`      | backend        | `postgres://postgres:postgres@localhost:5432/ticket_timeline?sslmode=disable` | Database connection |
+| `PORT`              | backend        | `8000`                                  | Port the backend listens on                                |
+| `COOKIE_SECURE`     | backend        | off                                     | Set to `true` when the site is served over HTTPS           |
+| `BACKEND_URL`       | frontend build | `http://localhost:8000`                 | Where the frontend forwards `/api/*`. Set it before `yarn build`. |
