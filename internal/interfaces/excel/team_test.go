@@ -213,6 +213,7 @@ func TestWriteTeamSheet(t *testing.T) {
 		{"SPinno Ticket Timeline", "L6", "0.604166666666667"},  // 6 h + 8 h 30 m
 		{"SPinno Ticket Timeline", "M6", "4"},                  // 3 + 1 review-backs
 		{"SPinno Ticket Timeline", "L9", "0.604166666666667"},  // total: the children only
+		{"SPinno Ticket Timeline", "M9", "4"},                  // review-backs, the children only
 	}
 	for _, v := range values {
 		if got := calc(v.sheet, v.ref); !sameNumber(got, v.want) {

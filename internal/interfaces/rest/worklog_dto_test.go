@@ -77,20 +77,31 @@ func TestOptionsBlackBoxWorkflow(t *testing.T) {
 	}
 }
 
-// A download's name starts with its date, as people say it.
+// A download's name starts with the days it covers, as people say them: a
+// week by its range, a day by itself.
 func TestExportName(t *testing.T) {
-	for _, c := range []struct{ day, what, want string }{
-		{"2026-11-09", "Weekly Report", "Nov 9 2026 Weekly Report.xlsx"},
-		{"2026-11-12", "Team Sheet", "Nov 12 2026 Team Sheet.xlsx"},
-		{"2026-01-05", fileSafe("Gerald Saberdo") + " Check-ins", "Jan 5 2026 Gerald Saberdo Check-ins.xlsx"},
-		{"2026-03-02", fileSafe(`A/B "C"`) + " Check-ins", "Mar 2 2026 A_B _C_ Check-ins.xlsx"},
+	for _, c := range []struct{ first, last, what, want string }{
+		{"2026-11-09", "2026-11-15", "Weekly Report", "Nov 9-15 2026 Weekly Report.xlsx"},
+		{"2026-11-10", "2026-11-10", "Daily Report", "Nov 10 2026 Daily Report.xlsx"},
+		{"2026-10-26", "2026-11-01", "Team Sheet", "Oct 26-Nov 1 2026 Team Sheet.xlsx"},
+		{"2026-12-28", "2027-01-03", "Weekly Report", "Dec 28 2026-Jan 3 2027 Weekly Report.xlsx"},
+		{"2026-01-05", "2026-01-11", fileSafe("Gerald Saberdo") + " Check-ins", "Jan 5-11 2026 Gerald Saberdo Check-ins.xlsx"},
+		{"2026-03-02", "2026-03-08", fileSafe(`A/B "C"`) + " Check-ins", "Mar 2-8 2026 A_B _C_ Check-ins.xlsx"},
 	} {
-		d, err := calendar.ParseDay(c.day)
+		first, err := calendar.ParseDay(c.first)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if got := exportName(d, c.what); got != c.want {
-			t.Errorf("exportName(%s, %q) = %q, want %q", c.day, c.what, got, c.want)
+		last, err := calendar.ParseDay(c.last)
+		if err != nil {
+			t.Fatal(err)
+		}
+		period, err := calendar.NewPeriod(first, last)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := exportName(period, c.what); got != c.want {
+			t.Errorf("exportName(%s..%s, %q) = %q, want %q", c.first, c.last, c.what, got, c.want)
 		}
 	}
 }

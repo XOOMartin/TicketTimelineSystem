@@ -10,6 +10,7 @@
 }
 
 .list li {
+  position: relative;
   flex: none;
 }
 
@@ -18,7 +19,8 @@
   flex-direction: column;
   gap: 4px;
   min-width: 150px;
-  padding: 10px 14px;
+  /* Room on the right for the × */
+  padding: 10px 30px 10px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
@@ -72,4 +74,35 @@
   margin: 0;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+/* The × in a chip's top-right corner: quiet until hovered, red then */
+.remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.remove:hover {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+.remove:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }

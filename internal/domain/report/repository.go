@@ -16,7 +16,9 @@ type Repository interface {
 	FindAll(ctx context.Context) ([]*Report, error)
 	// FindByID returns ErrNotFound when no report has the id.
 	FindByID(ctx context.Context, id ID) (*Report, error)
-	// FindByPeriod returns ErrNotFound when no report of the kind starts on
-	// the day.
-	FindByPeriod(ctx context.Context, kind Kind, first calendar.Day) (*Report, error)
+	// FindByPeriod returns ErrNotFound when no report of the kind covers
+	// exactly that period.
+	FindByPeriod(ctx context.Context, kind Kind, period calendar.Period) (*Report, error)
+	// Delete removes the saved report; ErrNotFound when no report has the id.
+	Delete(ctx context.Context, id ID) error
 }

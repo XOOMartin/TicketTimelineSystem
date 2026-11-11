@@ -114,9 +114,20 @@ export const importSheet = (userId: string, week: string, file: File) =>
 export const fetchOverview = (week: string) => request<Report>(`/admin/overview?week=${week}`)
 export const fetchReports = () => request<ReportSummary[]>('/admin/reports')
 export const fetchReport = (id: string) => request<Report>(`/admin/reports/${encodeURIComponent(id)}`)
-export const generateReport = (kind: ReportKind, day: string) =>
-  request<Report>('/admin/reports', json('POST', { kind, day }))
+// The daily or weekly report for the days from start to end, both included
+export const generateReport = (kind: ReportKind, start: string, end: string) =>
+  request<Report>('/admin/reports', json('POST', { kind, start, end }))
+export const deleteReport = (id: string) =>
+  request<void>(`/admin/reports/${encodeURIComponent(id)}`, { method: 'DELETE' })
 export const reportXlsxUrl = (id: string) => `${BASE_URL}/admin/reports/${encodeURIComponent(id)}/xlsx`
+// The daily or weekly report for the days picked, from the current data and
+// not saved: shown as soon as the days change, and its spreadsheet
+const rangeQuery = (kind: ReportKind, start: string, end: string) =>
+  new URLSearchParams({ kind, start, end }).toString()
+export const previewReport = (kind: ReportKind, start: string, end: string) =>
+  request<Report>(`/admin/reports/preview?${rangeQuery(kind, start, end)}`)
+export const previewXlsxUrl = (kind: ReportKind, start: string, end: string) =>
+  `${BASE_URL}/admin/reports/preview/xlsx?${rangeQuery(kind, start, end)}`
 // Everyone's whole timeline in the layout of the team's progress spreadsheet
 export const teamSheetUrl = () => `${BASE_URL}/admin/team-sheet.xlsx`
 

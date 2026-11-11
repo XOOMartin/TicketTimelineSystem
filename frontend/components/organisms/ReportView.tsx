@@ -8,6 +8,7 @@ import useOptions from 'hooks/useOptions'
 import { sumBy, toSegments, toSeriesSegments } from 'lib/chartData'
 import { PHASE_COLORS, STATUS_COLORS } from 'lib/colors'
 import { formatDay, formatHours } from 'lib/dates'
+import { REPORT_KIND_LABELS, reportDays } from 'lib/reports'
 import { Report } from 'types/worklog'
 
 import cardStyles from 'styles/Card.module.css'
@@ -16,30 +17,43 @@ import styles from 'styles/Table.module.css'
 
 const TABS = ['Tickets', 'Projects', 'People'] as const
 
+// The column of hours worked in the report's days
+const PERIOD_LABELS: Record<Report['kind'], string> = {
+  daily: 'Today',
+  weekly: 'This week',
+}
+
 type Props = {
   report: Report
   downloadUrl: string
+  // Built from the current data for the days picked, not saved yet
+  isPreview?: boolean
+  // A newer version is loading; this one stays until it arrives
+  isUpdating?: boolean
 }
 
 export default function ReportView(props: Props) {
-  const { report, downloadUrl } = props
+  const { report, downloadUrl, isPreview = false, isUpdating = false } = props
   const { options } = useOptions()
   const [tab, setTab] = useState<(typeof TABS)[number]>('Tickets')
 
-  const isWeekly = report.kind === 'weekly'
   const phases = options?.phases ?? []
   const statuses = options?.statuses ?? []
 
   return (
-    <section className={cardStyles.card}>
+    <section className={cardStyles.card} aria-busy={isUpdating || undefined}>
       <div className={viewStyles.header}>
         <div>
-          <span className={viewStyles.eyebrow}>{isWeekly ? 'Weekly report' : 'Daily report'}</span>
-          <h2>
-            {isWeekly
-              ? `${formatDay(report.period.first)} – ${formatDay(report.period.last)}`
-              : formatDay(report.period.first)}
-          </h2>
+          <span className={viewStyles.eyebrow}>
+            {REPORT_KIND_LABELS[report.kind]} report
+            {isPreview && (
+              <span className={viewStyles.live} title="Up to date with everyone’s latest check-ins. Generate saves it.">
+                Live · not saved
+              </span>
+            )}
+            {isUpdating && <span className={viewStyles.updating}>Updating…</span>}
+          </span>
+          <h2>{reportDays(report, true)}</h2>
         </div>
         <LinkButton href={downloadUrl} download>
           <Icon name="download" size={16} />
@@ -102,7 +116,7 @@ export default function ReportView(props: Props) {
       </div>
 
       {tab === 'Tickets' && (
-        <TicketTable rows={report.tickets} periodLabel={isWeekly ? 'This week' : 'Today'} showAssignees />
+        <TicketTable rows={report.tickets} periodLabel={PERIOD_LABELS[report.kind]} showAssignees />
       )}
 
       {tab === 'Projects' &&

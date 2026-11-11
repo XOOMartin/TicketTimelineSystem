@@ -155,9 +155,13 @@ CREATE TABLE IF NOT EXISTS reports (
 	last_day     TEXT NOT NULL,
 	data         TEXT NOT NULL, -- JSON of report.Data
 	generated_by TEXT NOT NULL,
-	generated_at TEXT NOT NULL,
-	UNIQUE (kind, first_day)
+	generated_at TEXT NOT NULL
 );
+-- One report per kind and range of days: a custom report can start on the
+-- same day as another and end on a different one. (Replaces the older
+-- one-per-start-day rule.)
+ALTER TABLE reports DROP CONSTRAINT IF EXISTS reports_kind_first_day_key;
+CREATE UNIQUE INDEX IF NOT EXISTS reports_kind_period ON reports (kind, first_day, last_day);
 `
 
 // Tables lists every table, parents before the tables that reference them.

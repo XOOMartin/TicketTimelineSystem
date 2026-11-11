@@ -86,6 +86,13 @@ func WeekOf(d Day) Period {
 	return Period{first: monday, last: monday.AddDays(6)}
 }
 
+// WorkWeekOf is the Monday–Friday working week that d falls in, the days a
+// weekly report covers (a weekend day belongs to the week before it).
+func WorkWeekOf(d Day) Period {
+	week := WeekOf(d)
+	return Period{first: week.first, last: week.first.AddDays(4)}
+}
+
 func (p Period) First() Day { return p.first }
 func (p Period) Last() Day  { return p.last }
 

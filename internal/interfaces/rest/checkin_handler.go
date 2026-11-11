@@ -270,7 +270,7 @@ func (h *CheckInHandler) export(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 		return
 	}
-	name := exportName(week.Period.First(), fileSafe(u.Name())+" Check-ins")
+	name := exportName(week.Period, fileSafe(u.Name())+" Check-ins")
 	writeXLSX(w, name, func(buf *bytes.Buffer) error { return excel.WriteWeek(buf, u, week) })
 }
 
@@ -285,8 +285,25 @@ func fileSafe(s string) string {
 	}, s)
 }
 
-// exportName is a download's file name: its date first, the way people say
-// it, so the newest is easy to find, e.g. "Nov 9 2026 Weekly Report.xlsx".
-func exportName(day calendar.Day, what string) string {
-	return day.Start().Format("Jan 2 2006") + " " + what + ".xlsx"
+// exportName is a download's file name: the days it covers first, the way
+// people say them, so the newest is easy to find. A week is named by its
+// range, e.g. "Nov 9-15 2026 Weekly Report.xlsx"; a single day by that day.
+func exportName(period calendar.Period, what string) string {
+	return periodName(period) + " " + what + ".xlsx"
+}
+
+// periodName says a period's days briefly: "Nov 10 2026", "Nov 9-15 2026",
+// "Oct 26-Nov 1 2026", or across a new year "Dec 28 2026-Jan 3 2027".
+func periodName(period calendar.Period) string {
+	first, last := period.First().Start(), period.Last().Start()
+	switch {
+	case period.First() == period.Last():
+		return first.Format("Jan 2 2006")
+	case first.Year() != last.Year():
+		return first.Format("Jan 2 2006") + "-" + last.Format("Jan 2 2006")
+	case first.Month() != last.Month():
+		return first.Format("Jan 2") + "-" + last.Format("Jan 2 2006")
+	default:
+		return first.Format("Jan 2") + "-" + last.Format("2 2006")
+	}
 }

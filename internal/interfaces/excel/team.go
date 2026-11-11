@@ -807,9 +807,14 @@ func writeSPinnoTimeline(f *excelize.File, st *styler, members []application.Mem
 	if err := st.style(sh, ref(2, row), ref(5, row), look); err != nil {
 		return err
 	}
-	for col := 6; col <= 12; col++ {
+	// Hours (F to L), then the review-backs (M), so the row is boxed in to
+	// the table's last column
+	for col := 6; col <= 13; col++ {
 		cs := look
 		cs.numFmt = durationFmt
+		if col == 13 {
+			cs.numFmt = "0"
+		}
 		value := "=0"
 		if last >= first {
 			value = fmt.Sprintf(`=SUMIF($B$%d:$B$%d,"Child",%s:%s)`, first, last, ref(col, first), ref(col, last))

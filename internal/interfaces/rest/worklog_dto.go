@@ -340,9 +340,12 @@ type sheetImportResponse struct {
 	Added   int                 `json:"added"`
 }
 
+// generateReportRequest is the kind of report (daily or weekly) and its
+// first and last day, both included
 type generateReportRequest struct {
-	Kind string `json:"kind"`
-	Day  string `json:"day"`
+	Kind  string `json:"kind"`
+	Start string `json:"start"`
+	End   string `json:"end"`
 }
 
 type reportSummaryResponse struct {

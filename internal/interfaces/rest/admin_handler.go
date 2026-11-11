@@ -38,7 +38,11 @@ func (h *AdminHandler) Register(r *mux.Router) {
 	r.HandleFunc("/admin/overview", h.overview).Methods(http.MethodGet)
 	r.HandleFunc("/admin/reports", h.listReports).Methods(http.MethodGet)
 	r.HandleFunc("/admin/reports", h.generateReport).Methods(http.MethodPost)
+	// Before /admin/reports/{id}, so "preview" isn't taken for an id
+	r.HandleFunc("/admin/reports/preview", h.previewReport).Methods(http.MethodGet)
+	r.HandleFunc("/admin/reports/preview/xlsx", h.downloadPreview).Methods(http.MethodGet)
 	r.HandleFunc("/admin/reports/{id}", h.getReport).Methods(http.MethodGet)
+	r.HandleFunc("/admin/reports/{id}", h.deleteReport).Methods(http.MethodDelete)
 	r.HandleFunc("/admin/reports/{id}/xlsx", h.downloadReport).Methods(http.MethodGet)
 	r.HandleFunc("/admin/team-sheet.xlsx", h.downloadTeamSheet).Methods(http.MethodGet)
 	// User management: deleting is soft (restorable); /permanent is for good
@@ -155,7 +159,7 @@ func (h *AdminHandler) generateReport(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &req) {
 		return
 	}
-	rp, err := h.reports.Generate(r.Context(), req.Kind, req.Day, currentUser(r).Name())
+	rp, err := h.reports.Generate(r.Context(), req.Kind, req.Start, req.End, currentUser(r).Name())
 	if err != nil {
 		writeError(w, err)
 		return
@@ -172,6 +176,15 @@ func (h *AdminHandler) getReport(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, toReportResponse(rp))
 }
 
+// deleteReport removes a saved report from the list
+func (h *AdminHandler) deleteReport(w http.ResponseWriter, r *http.Request) {
+	if err := h.reports.Delete(r.Context(), mux.Vars(r)["id"]); err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // downloadReport exports the report's day or week in the layout of the
 // team's Ticket_Progress_Timeline spreadsheet: each user's timeline for it
 func (h *AdminHandler) downloadReport(w http.ResponseWriter, r *http.Request) {
@@ -180,21 +193,49 @@ func (h *AdminHandler) downloadReport(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 		return
 	}
-	members, err := h.members.TeamTimelinesFor(r.Context(), rp.Period())
+	h.writeReportSheet(w, r, rp.Kind(), rp.Period())
+}
+
+// previewReport is the daily or weekly report for ?kind=&start=&end=, built
+// from the current data and not saved, as JSON
+func (h *AdminHandler) previewReport(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	rp, err := h.reports.PreviewRange(r.Context(), q.Get("kind"), q.Get("start"), q.Get("end"))
 	if err != nil {
 		writeError(w, err)
 		return
 	}
-	p := rp.Period()
-	subtitle := fmt.Sprintf("Weekly report — %s to %s", p.First(), p.Last())
+	writeJSON(w, http.StatusOK, toReportResponse(rp))
+}
+
+// downloadPreview is the previewed report's spreadsheet, without saving it
+func (h *AdminHandler) downloadPreview(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	kind, period, err := application.ParseReportRange(q.Get("kind"), q.Get("start"), q.Get("end"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	h.writeReportSheet(w, r, kind, period)
+}
+
+// writeReportSheet sends the report's days in the layout of the team's
+// Ticket_Progress_Timeline spreadsheet: each user's timeline for them
+func (h *AdminHandler) writeReportSheet(w http.ResponseWriter, r *http.Request, k report.Kind, p calendar.Period) {
+	members, err := h.members.TeamTimelinesFor(r.Context(), p)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	label, kind := "Weekly report", "Weekly Report"
+	if k == report.KindDaily {
+		label, kind = "Daily report", "Daily Report"
+	}
+	subtitle := fmt.Sprintf("%s — %s to %s", label, p.First(), p.Last())
 	if p.First() == p.Last() {
-		subtitle = fmt.Sprintf("Daily report — %s", p.First())
+		subtitle = fmt.Sprintf("%s — %s", label, p.First())
 	}
-	kind := "Weekly Report"
-	if rp.Kind() == report.KindDaily {
-		kind = "Daily Report"
-	}
-	name := exportName(p.First(), kind)
+	name := exportName(p, kind)
 	writeXLSX(w, name, func(buf *bytes.Buffer) error { return excel.WriteTeamSheet(buf, members, subtitle) })
 }
 
@@ -207,7 +248,8 @@ func (h *AdminHandler) downloadTeamSheet(w http.ResponseWriter, r *http.Request)
 		writeError(w, err)
 		return
 	}
-	name := exportName(calendar.DayOf(now), "Team Sheet")
+	// Named by this working week (Monday to Friday), like the weekly reports
+	name := exportName(calendar.WorkWeekOf(calendar.DayOf(now)), "Team Sheet")
 	writeXLSX(w, name, func(buf *bytes.Buffer) error { return excel.WriteTeamSheet(buf, members, "") })
 }
 

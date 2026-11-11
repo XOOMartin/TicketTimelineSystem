@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"crud_app/internal/domain/calendar"
@@ -37,31 +38,72 @@ func (s *ReportService) Get(ctx context.Context, id string) (*report.Report, err
 	return s.reports.FindByID(ctx, report.ID(id))
 }
 
-// Generate builds the daily or weekly report covering day and saves it,
-// replacing an earlier report of the same period.
-func (s *ReportService) Generate(ctx context.Context, kind, day, generatedBy string) (*report.Report, error) {
-	k, err := report.ParseKind(kind)
-	if err != nil {
-		return nil, err
-	}
-	d, err := calendar.ParseDay(day)
-	if err != nil {
-		return nil, err
-	}
-	return s.generate(ctx, k, k.PeriodFor(d), generatedBy, time.Now())
+// Delete removes a saved report. Its days can be generated again; the
+// check-ins it was built from are untouched.
+func (s *ReportService) Delete(ctx context.Context, id string) error {
+	return s.reports.Delete(ctx, report.ID(id))
 }
 
-// GenerateWeeklyIfDue makes this week's report once it is Friday 17:00 or
-// later, unless it already exists. It catches up on the weekend if the
-// server was down on Friday.
+// Generate builds the daily or weekly report for the days from start to
+// end, both included, and saves it, replacing an earlier report of the same
+// kind and days. The admin picks the days, so a weekly report can be, say,
+// Monday to Friday.
+func (s *ReportService) Generate(ctx context.Context, kind, start, end, generatedBy string) (*report.Report, error) {
+	k, period, err := ParseReportRange(kind, start, end)
+	if err != nil {
+		return nil, err
+	}
+	return s.generate(ctx, k, period, generatedBy, time.Now())
+}
+
+// PreviewRange builds the daily or weekly report for the days from start to
+// end without saving it, so the Reports page can show it as soon as the
+// days are picked; Generate saves it.
+func (s *ReportService) PreviewRange(ctx context.Context, kind, start, end string) (*report.Report, error) {
+	k, period, err := ParseReportRange(kind, start, end)
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+	data, err := s.build(ctx, period, now)
+	if err != nil {
+		return nil, err
+	}
+	return report.New("", k, period, data, "", now), nil
+}
+
+// ParseReportRange checks a report's kind and its first and last day.
+func ParseReportRange(kind, start, end string) (report.Kind, calendar.Period, error) {
+	k, err := report.ParseKind(kind)
+	if err != nil {
+		return "", calendar.Period{}, err
+	}
+	first, err := calendar.ParseDay(start)
+	if err != nil {
+		return "", calendar.Period{}, fmt.Errorf("%w: pick a start date", report.ErrInvalid)
+	}
+	last, err := calendar.ParseDay(end)
+	if err != nil {
+		return "", calendar.Period{}, fmt.Errorf("%w: pick an end date", report.ErrInvalid)
+	}
+	period, err := calendar.NewPeriod(first, last)
+	if err != nil {
+		return "", calendar.Period{}, fmt.Errorf("%w: the end date is before the start date", report.ErrInvalid)
+	}
+	return k, period, nil
+}
+
+// GenerateWeeklyIfDue makes this week's report, Monday to Friday, once it
+// is Friday 17:00 or later, unless it already exists. It catches up on the
+// weekend if the server was down on Friday.
 func (s *ReportService) GenerateWeeklyIfDue(ctx context.Context, now time.Time) (*report.Report, error) {
-	period := calendar.WeekOf(calendar.DayOf(now))
+	period := calendar.WorkWeekOf(calendar.DayOf(now))
 	dueDay := period.First().AddDays((int(WeeklyReportAt.Weekday) + 6) % 7)
 	due := dueDay.Start().Add(time.Duration(WeeklyReportAt.Hour) * time.Hour)
 	if now.Before(due) {
 		return nil, nil
 	}
-	_, err := s.reports.FindByPeriod(ctx, report.KindWeekly, period.First())
+	_, err := s.reports.FindByPeriod(ctx, report.KindWeekly, period)
 	if !errors.Is(err, report.ErrNotFound) {
 		return nil, err // nil error: already generated
 	}
@@ -110,5 +152,5 @@ func (s *ReportService) generate(ctx context.Context, kind report.Kind, period c
 		return nil, err
 	}
 	// Saving over an existing period keeps the old id, so read it back.
-	return s.reports.FindByPeriod(ctx, kind, period.First())
+	return s.reports.FindByPeriod(ctx, kind, period)
 }

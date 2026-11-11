@@ -37,8 +37,7 @@ func (r *ReportRepository) Save(ctx context.Context, rp *report.Report) error {
 	_, err = r.db.ExecContext(ctx, `
 		INSERT INTO reports (`+reportColumns+`)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		ON CONFLICT (kind, first_day) DO UPDATE SET
-			last_day = excluded.last_day,
+		ON CONFLICT (kind, first_day, last_day) DO UPDATE SET
 			data = excluded.data,
 			generated_by = excluded.generated_by,
 			generated_at = excluded.generated_at`,
@@ -49,7 +48,7 @@ func (r *ReportRepository) Save(ctx context.Context, rp *report.Report) error {
 }
 
 func (r *ReportRepository) FindAll(ctx context.Context) ([]*report.Report, error) {
-	rows, err := r.db.QueryContext(ctx, `SELECT `+reportColumns+` FROM reports ORDER BY first_day DESC, kind DESC`)
+	rows, err := r.db.QueryContext(ctx, `SELECT `+reportColumns+` FROM reports ORDER BY first_day DESC, last_day DESC, kind DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -74,14 +73,28 @@ func (r *ReportRepository) FindByID(ctx context.Context, id report.ID) (*report.
 	return rp, err
 }
 
-func (r *ReportRepository) FindByPeriod(ctx context.Context, kind report.Kind, first calendar.Day) (*report.Report, error) {
+func (r *ReportRepository) FindByPeriod(ctx context.Context, kind report.Kind, period calendar.Period) (*report.Report, error) {
 	rp, err := scanReport(r.db.QueryRowContext(ctx,
-		`SELECT `+reportColumns+` FROM reports WHERE kind = $1 AND first_day = $2`, string(kind), first.String(),
+		`SELECT `+reportColumns+` FROM reports WHERE kind = $1 AND first_day = $2 AND last_day = $3`,
+		string(kind), period.First().String(), period.Last().String(),
 	))
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, report.ErrNotFound
 	}
 	return rp, err
+}
+
+func (r *ReportRepository) Delete(ctx context.Context, id report.ID) error {
+	res, err := r.db.ExecContext(ctx, `DELETE FROM reports WHERE id = $1`, string(id))
+	if err != nil {
+		return err
+	}
+	if n, err := res.RowsAffected(); err != nil {
+		return err
+	} else if n == 0 {
+		return report.ErrNotFound
+	}
+	return nil
 }
 
 func scanReport(s scanner) (*report.Report, error) {

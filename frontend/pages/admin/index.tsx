@@ -12,6 +12,7 @@ import useAdminOverview from 'hooks/useAdminOverview'
 import useOptions from 'hooks/useOptions'
 import { STATUS_COLORS, SUBMISSION_COLORS } from 'lib/colors'
 import { formatDateTime, formatDay, formatHours } from 'lib/dates'
+import { REPORT_KIND_LABELS, reportDays } from 'lib/reports'
 
 import styles from 'styles/Dashboard.module.css'
 
@@ -52,8 +53,7 @@ export default function AdminDashboard() {
   const reportItems: ListCardItem[] = reports.map((r) => ({
     key: r.id,
     color: r.kind === 'weekly' ? 'var(--accent)' : 'var(--blue)',
-    primary:
-      r.kind === 'weekly' ? `Weekly · week of ${formatDay(r.period.first)}` : `Daily · ${formatDay(r.period.first)}`,
+    primary: `${REPORT_KIND_LABELS[r.kind]} · ${reportDays(r, true)}`,
     secondary: `${r.generatedBy} · ${formatDateTime(r.generatedAt)}`,
     aside: `${r.ticketCount} tickets`,
   }))
