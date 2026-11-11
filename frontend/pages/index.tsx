@@ -4,6 +4,7 @@ import Message from 'components/atoms/Message'
 import PageLayout from 'components/layouts/PageLayout'
 import Toast from 'components/molecules/Toast'
 import WeekPicker from 'components/molecules/WeekPicker'
+import TeamActivity from 'components/organisms/TeamActivity'
 import WeekOverview from 'components/organisms/WeekOverview'
 import useAuth from 'hooks/useAuth'
 import useMyWeek from 'hooks/useMyWeek'
@@ -33,7 +34,14 @@ export default function Dashboard() {
         <>
           {error && <Message variant="error">{error}</Message>}
 
-          <WeekOverview name={user.name} data={data} isLoading={isLoading} isOwn />
+          <WeekOverview
+            name={user.name}
+            data={data}
+            isLoading={isLoading}
+            isOwn
+            // Who on the team is working right now, under the Check-ins and Tickets tiles
+            afterStats={<TeamActivity currentUserId={user.id} />}
+          />
         </>
       )}
       <Toast message={notice} onDone={clearNotice} />

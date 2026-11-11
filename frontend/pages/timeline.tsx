@@ -6,6 +6,7 @@ import Icon from 'components/atoms/Icon'
 import Message from 'components/atoms/Message'
 import PageLayout from 'components/layouts/PageLayout'
 import ConfirmDialog from 'components/molecules/ConfirmDialog'
+import AddRevisionDialog from 'components/organisms/AddRevisionDialog'
 import Toast from 'components/molecules/Toast'
 import WeekPicker from 'components/molecules/WeekPicker'
 import DeleteRoundDialog from 'components/organisms/DeleteRoundDialog'
@@ -67,7 +68,6 @@ export default function Timeline() {
     saveCell,
     removeTicket,
     removeRound,
-    addReviewBack,
     setStep,
     recordOutcome,
   } = myWeek
@@ -111,6 +111,8 @@ export default function Timeline() {
   const [draft, setDraft] = useState<TicketRow | null>(null)
   // The row waiting for the user to confirm deleting it
   const [deleting, setDeleting] = useState<TicketRow | null>(null)
+  // The ticket whose + asks which review requested changes, to add a revision
+  const [revisionFor, setRevisionFor] = useState<TicketRow | null>(null)
   // The ticket whose progress steps are open; its row follows the data, so
   // the steps move on as time is recorded
   const [progressKey, setProgressKey] = useState<string | null>(null)
@@ -223,7 +225,7 @@ export default function Timeline() {
               onDelete={setDeleting}
               onEditRound={(row, round, field) => edit(row, round, field)}
               onSaveCell={saveCell}
-              onAddRound={addReviewBack}
+              onAddRound={setRevisionFor}
               onAddChild={enterUnder}
               onMakeParent={makeParent}
               onMakeChild={makeChild}
@@ -288,6 +290,14 @@ export default function Timeline() {
                 setProgressKey(null)
                 setEntered(null)
               }}
+            />
+          )}
+
+          {revisionFor && (
+            <AddRevisionDialog
+              row={revisionFor}
+              onRecord={(input, message) => recordOutcome(revisionFor, input, message)}
+              onClose={() => setRevisionFor(null)}
             />
           )}
 

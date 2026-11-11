@@ -14,6 +14,7 @@ import {
   SheetImport,
   SignupInput,
   StoppedTimer,
+  TeamActivity,
   TicketWorkInput,
   TimerInput,
   User,
@@ -117,6 +118,8 @@ export const fetchReport = (id: string) => request<Report>(`/admin/reports/${enc
 // The daily or weekly report for the days from start to end, both included
 export const generateReport = (kind: ReportKind, start: string, end: string) =>
   request<Report>('/admin/reports', json('POST', { kind, start, end }))
+// Who on the team is busy right now, and on what
+export const fetchTeamActivity = () => request<TeamActivity>('/team/activity')
 export const deleteReport = (id: string) =>
   request<void>(`/admin/reports/${encodeURIComponent(id)}`, { method: 'DELETE' })
 export const reportXlsxUrl = (id: string) => `${BASE_URL}/admin/reports/${encodeURIComponent(id)}/xlsx`

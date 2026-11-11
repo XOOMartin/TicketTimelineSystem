@@ -40,10 +40,24 @@ func TestAfterStep(t *testing.T) {
 		}
 		return p
 	}
-	// Implementation: the leads approving the issue leads to coding, whose
-	// time goes on Coding
-	if p := next(TypeImplementation, 1, "lead_review"); p.FlowStep != "code" || p.Step != PhaseCoding || p.Round != 1 {
-		t.Errorf("after lead_review = %+v", p)
+	// Implementation and integration testing: the leads confirming the spec
+	// leads to planning, whose time goes on Planning, then to the work
+	for _, tt := range []TicketType{TypeImplementation, TypeIntegration} {
+		if p := next(tt, 1, "lead_review"); p.FlowStep != "plan" || p.Step != PhasePlanning || p.Round != 1 {
+			t.Errorf("%s: after lead_review = %+v, want plan", tt, p)
+		}
+	}
+	if p := next(TypeImplementation, 1, "plan"); p.FlowStep != "code" || p.Step != PhaseCoding {
+		t.Errorf("after plan = %+v, want code", p)
+	}
+	if p := next(TypeIntegration, 1, "plan"); p.FlowStep != "staging_test" || p.Step != PhaseTesting {
+		t.Errorf("integration: after plan = %+v, want staging_test", p)
+	}
+	// Changes asked for in the final review start a review-back at planning
+	for _, tt := range []TicketType{TypeImplementation, TypeIntegration} {
+		if again := WorkflowOf(tt).Again; len(again) == 0 || again[0].Key != "plan" || again[0].Phase != PhasePlanning {
+			t.Errorf("%s: review-back starts at %+v, want plan", tt, again)
+		}
 	}
 	// No type files the ticket as a step of its own any more
 	for _, tt := range Types() {
@@ -52,8 +66,8 @@ func TestAfterStep(t *testing.T) {
 		}
 	}
 	// A ticket saved on File ticket carries on from the step after it
-	if p, ok := StepNow("ana", key, TypeIntegration, 1, "file"); !ok || p.FlowStep != "staging_test" {
-		t.Errorf("saved on file = %+v, %v; want staging_test", p, ok)
+	if p, ok := StepNow("ana", key, TypeIntegration, 1, "file"); !ok || p.FlowStep != "plan" {
+		t.Errorf("saved on file = %+v, %v; want plan", p, ok)
 	}
 	if p, ok := StepNow("ana", key, TypeInvestigation, 1, "file"); !ok || p.FlowStep != "cho_review" {
 		t.Errorf("investigation saved on file = %+v, %v; want cho_review", p, ok)
@@ -93,8 +107,8 @@ func TestAfterStep(t *testing.T) {
 	if p := next(TypeImplementation, 2, "redo_draft"); p.FlowStep != "redo_lead_review" || p.Round != 2 {
 		t.Errorf("after redo_draft = %+v, want redo_lead_review", p)
 	}
-	if p := next(TypeImplementation, 2, "redo_lead_review"); p.FlowStep != "redo_code" || p.Step != PhaseCoding {
-		t.Errorf("after redo_lead_review = %+v, want redo_code", p)
+	if p := next(TypeImplementation, 2, "redo_lead_review"); p.FlowStep != "redo_plan" || p.Step != PhasePlanning {
+		t.Errorf("after redo_lead_review = %+v, want redo_plan", p)
 	}
 	if p := next(TypeImplementation, 3, "redo_close"); !p.Finished {
 		t.Errorf("after redo_close = %+v, want finished", p)

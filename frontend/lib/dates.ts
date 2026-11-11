@@ -87,3 +87,17 @@ export function formatTimeOfDay(iso: string): string {
 export function formatShortDay(day: string): string {
   return fromDay(day).toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
+
+// How long ago a moment was, briefly: "just now", "5m ago", "3h ago",
+// "yesterday", "4d ago", then the day itself
+export function formatTimeAgo(iso: string, now = Date.now()): string {
+  const minutes = Math.floor((now - new Date(iso).getTime()) / 60_000)
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days === 1) return 'yesterday'
+  if (days < 7) return `${days}d ago`
+  return formatShortDay(toDay(new Date(iso)))
+}

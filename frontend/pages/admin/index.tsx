@@ -6,9 +6,11 @@ import ListCard, { ListCardItem } from 'components/molecules/ListCard'
 import StatTile from 'components/molecules/StatTile'
 import WeekPicker from 'components/molecules/WeekPicker'
 import SectionHeader from 'components/molecules/SectionHeader'
+import TeamActivity from 'components/organisms/TeamActivity'
 import TeamBreakdown from 'components/organisms/TeamBreakdown'
 import TicketTable from 'components/organisms/TicketTable'
 import useAdminOverview from 'hooks/useAdminOverview'
+import useAuth from 'hooks/useAuth'
 import useOptions from 'hooks/useOptions'
 import { STATUS_COLORS, SUBMISSION_COLORS } from 'lib/colors'
 import { formatDateTime, formatDay, formatHours } from 'lib/dates'
@@ -19,6 +21,7 @@ import styles from 'styles/Dashboard.module.css'
 // The whole team's week: who is behind, what is stuck, and where the
 // hours went.
 export default function AdminDashboard() {
+  const { user } = useAuth()
   const { statusLabel } = useOptions()
   const { week, setWeek, members, overview, reports, isLoading, error } = useAdminOverview()
 
@@ -107,6 +110,9 @@ export default function AdminDashboard() {
               warn={stuck.length > 0}
             />
           </div>
+
+          {/* Who is working right now, and on what */}
+          <TeamActivity currentUserId={user?.id} />
 
           <div className={styles.lists}>
             <ListCard

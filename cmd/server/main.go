@@ -42,6 +42,7 @@ func main() {
 	memberService := application.NewMemberService(users, checkIns, postgres.NewImportRepository(db), ticketDates, progress, planned, parents, types)
 	timerService := application.NewTimerService(postgres.NewTimerRepository(db), checkIns, progress, types, parents, planned)
 	reportService := application.NewReportService(postgres.NewReportRepository(db), checkIns, users)
+	teamService := application.NewTeamService(users, postgres.NewTimerRepository(db), checkIns, memberService)
 
 	go runWeeklyReports(reportService)
 	go stopClosedTimers(timerService)
@@ -56,6 +57,7 @@ func main() {
 	members.Use(authHandler.RequireUser)
 	rest.NewCheckInHandler(checkInService).Register(members)
 	rest.NewTimerHandler(timerService).Register(members)
+	rest.NewTeamHandler(teamService).Register(members)
 
 	admins := members.NewRoute().Subrouter()
 	admins.Use(rest.RequireAdmin)

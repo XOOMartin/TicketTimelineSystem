@@ -113,4 +113,6 @@ type TimerRepository interface {
 	// FindClosedBefore returns every user's timer whose site was closed at
 	// or before the time given.
 	FindClosedBefore(ctx context.Context, at time.Time) ([]Timer, error)
+	// FindAll returns every user's running timer, for who is busy right now.
+	FindAll(ctx context.Context) ([]Timer, error)
 }

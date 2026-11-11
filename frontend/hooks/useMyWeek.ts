@@ -9,11 +9,10 @@ import * as api from 'lib/api'
 import { formatShortHours, toDay } from 'lib/dates'
 import { latestRound, roundLabel, roundPhaseHours } from 'lib/rounds'
 import { ticketKeyOf } from 'lib/tickets'
-import { lastReview, reviewBackStart, workflowOf } from 'lib/workflows'
 import { CellChange, CheckInInput, OutcomeInput, TicketRow, TicketWorkInput } from 'types/worklog'
 
 export default function useMyWeek() {
-  const { options, typeLabel } = useOptions()
+  const { typeLabel } = useOptions()
   const [week, setWeek] = useWeek()
   const { data, isLoading, error, setError, reload } = useResource(() => api.fetchMyWeek(week), [week])
   // Runs a change, confirms it (a notice for a toast), then reloads so the
@@ -103,17 +102,6 @@ export default function useMyWeek() {
     mutate(() => api.setStep(row, step, row.stepRound), `${row.ticketKey}: on to ${label}`)
   const recordOutcome = (row: TicketRow, input: OutcomeInput, message: string) =>
     mutate(() => api.recordOutcome(row, input), `${row.ticketKey}: ${message}`)
-  // Starts the ticket's next round, as a review asking for changes does: a
-  // review-back, from planning, with no time until some is logged on it
-  const addReviewBack = (row: TicketRow) => {
-    const round = latestRound(row) + 1
-    // As if the last review had asked for changes: where its review-back
-    // starts (a BlackBox ticket's: planning)
-    const workflow = options ? workflowOf(row, options.workflows) : undefined
-    const review = workflow && lastReview(workflow)
-    const step = (workflow && review && reviewBackStart(review, workflow)?.key) ?? 'planning'
-    return mutate(() => api.setStep(row, step, round), `${row.ticketKey}: ${roundLabel(round)} added`)
-  }
   const removeTicket = (row: TicketRow) => mutate(() => api.deleteTicket(row), `Deleted ${row.ticketKey}`)
   // Deletes one round (e.g. a review-back logged or started by mistake): its
   // time, or the review-back itself if it has none yet. The ticket's other
@@ -142,7 +130,6 @@ export default function useMyWeek() {
     remove,
     removeTicket,
     removeRound,
-    addReviewBack,
     setStep,
     recordOutcome,
     exportUrl: api.exportUrl(week),

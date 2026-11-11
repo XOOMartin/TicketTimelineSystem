@@ -34,8 +34,16 @@ func (r *TimerRepository) Find(ctx context.Context, userID user.ID) (*worklog.Ti
 
 func (r *TimerRepository) FindClosedBefore(ctx context.Context, at time.Time) ([]worklog.Timer, error) {
 	// Times are stored in one fixed UTC layout, so they compare as text
-	rows, err := r.db.QueryContext(ctx,
+	return r.findMany(ctx,
 		`SELECT `+timerColumns+` FROM timers WHERE closing_at IS NOT NULL AND closing_at <= $1`, formatTime(at))
+}
+
+func (r *TimerRepository) FindAll(ctx context.Context) ([]worklog.Timer, error) {
+	return r.findMany(ctx, `SELECT `+timerColumns+` FROM timers`)
+}
+
+func (r *TimerRepository) findMany(ctx context.Context, query string, args ...any) ([]worklog.Timer, error) {
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

@@ -328,3 +328,43 @@ export type OutcomeInput = {
   comment: string
   title: string // starts a ticket that has no time yet
 }
+
+// Whether someone has work on the go: busy (a ticket ongoing) or available
+// (none)
+export type ActivityState = 'busy' | 'available'
+
+// A ticket and phase someone is timing, or last logged time on
+export type WorkingOn = {
+  ticketKey: string
+  title: string
+  round: number
+  phase: string
+  phaseLabel: string
+}
+
+export type MemberActivity = {
+  id: string
+  name: string
+  team: string
+  state: ActivityState
+  // The ticket they're timing, else their latest ongoing one (logged at
+  // currentAt); null when available
+  current: WorkingOn | null
+  currentAt: string | null
+  // Their timer, if one is on, and its time when fetched (pauses left out)
+  timer: 'running' | 'paused' | ''
+  elapsedSeconds: number
+  last: WorkingOn | null
+  lastAt: string | null
+  // Logged today, not counting a running timer
+  todayHours: number
+  // Tickets being worked on, and on hold
+  ongoingTickets: number
+  waitingTickets: number
+  blockedTickets: number
+}
+
+export type TeamActivity = {
+  asOf: string
+  members: MemberActivity[]
+}

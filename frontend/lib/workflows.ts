@@ -15,9 +15,6 @@ export const workflowOf = (row: TicketRow, workflows: Record<string, Workflow>):
 export const reviewBackStart = (review: FlowStep, workflow: Workflow): FlowStep | undefined =>
   workflow.again.find((s) => s.key === review.changesTo) ?? workflow.again[0]
 
-// The last review that starts a review-back: the one an added review-back
-// (the table's + review-back) stands for
-export const lastReview = (workflow: Workflow) => [...workflow.first].reverse().find((s) => s.changesNewRound)
 
 // Its current step is kept as flowStep (a typed ticket) or step (a phase)
 export const currentStepOf = (row: TicketRow) => (row.type ? row.flowStep : row.step) ?? ''

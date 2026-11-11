@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { useRouter } from 'next/router'
 
 import Icon from 'components/atoms/Icon'
@@ -24,11 +25,13 @@ type Props = {
   // The member's own view links each ticket to editing it in their
   // timeline; an admin's view of someone else doesn't.
   isOwn?: boolean
+  // Shown right under the Check-ins and Tickets tiles, e.g. Team activity
+  afterStats?: ReactNode
 }
 
 // A member's week: the tickets they worked on and where the time went.
 export default function WeekOverview(props: Props) {
-  const { name, data, isLoading, isOwn = false } = props
+  const { name, data, isLoading, isOwn = false, afterStats } = props
   const { options, phaseLabel, statusLabel } = useOptions()
   const router = useRouter()
 
@@ -77,6 +80,7 @@ export default function WeekOverview(props: Props) {
         <StatTile icon="list" color="var(--blue)" label="Check-ins" value={String(person?.checkIns ?? 0)} />
         <StatTile icon="ticket" color="var(--green)" label="Tickets" value={String(tickets.length)} />
       </div>
+      {afterStats}
 
       <div className={styles.lists}>
         <ListCard

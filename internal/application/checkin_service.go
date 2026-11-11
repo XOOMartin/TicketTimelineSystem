@@ -1179,18 +1179,19 @@ func (s *CheckInService) SetTotals(ctx context.Context, u *user.User, cmd Ticket
 		}
 	}
 	result = append(result, added...)
-	// Clearing a round is fine (e.g. a review-back logged by mistake), but
-	// the ticket must keep some time, unless it was added without time: then
-	// its details are saved on it, and any time cleared goes
+	// Clearing a round is fine (e.g. a review-back logged by mistake), and so
+	// is clearing all of the ticket's time: it stays in the timeline with no
+	// time, like a ticket added without any, its details saved on it
 	if len(result) == 0 {
+		addedAt := now
 		planned, err := s.planned.Find(ctx, u.ID(), key)
-		if errors.Is(err, worklog.ErrNotFound) {
-			return nil, fmt.Errorf("%w: enter the time spent on at least one phase", worklog.ErrInvalid)
-		}
-		if err != nil {
+		switch {
+		case err == nil:
+			addedAt = planned.AddedAt
+		case !errors.Is(err, worklog.ErrNotFound):
 			return nil, err
 		}
-		if planned, err = worklog.NewPlannedTicket(u.ID(), key, cmd.Title, status, cmd.Note, planned.AddedAt); err != nil {
+		if planned, err = worklog.NewPlannedTicket(u.ID(), key, cmd.Title, status, cmd.Note, addedAt); err != nil {
 			return nil, err
 		}
 		remove := make([]worklog.ID, 0, len(removed))

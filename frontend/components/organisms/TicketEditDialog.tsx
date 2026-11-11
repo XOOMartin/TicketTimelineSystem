@@ -136,8 +136,6 @@ export default function TicketEditDialog(props: Props) {
   else if (isDone && addsRound) missing = 'A done ticket can’t get a new revision: change its status first'
   else if (bad) missing = `Fix the time for ${bad.p.label} in ${roundLabel(bad.r)}`
   else if (tooMuch) missing = `Add at most ${maxHours} h to ${tooMuch.p.label} at a time`
-  // A ticket added without time can stay at none; once it has time, it keeps some
-  else if (ticketNow <= 0 && ticketWas > 0) missing = 'The ticket needs some time on at least one phase'
   else if (status === 'blocked' && note.trim() === '') missing = 'Say what is blocking the ticket in the note'
   else if (startDate && endDate && endDate < startDate) missing = 'The end date can’t be before the start date'
   else if (parentChanged && parentNumber !== '' && !isTicketNumber(parentNumber))

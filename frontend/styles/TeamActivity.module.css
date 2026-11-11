@@ -1,0 +1,394 @@
+/* Team activity: who's working right now. A table on wide screens, one
+   small card per person on narrow ones (never a sideways scroll). */
+.card {
+  container: team / inline-size;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 18px 20px 14px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.subheading {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* "2 busy · 3 not busy" as small pills */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.count i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.message {
+  margin: 0;
+  padding: 4px 20px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background: var(--sidebar);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 20px;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 20px;
+}
+
+.table tbody tr {
+  transition: background 0.12s;
+}
+
+.table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* The person looking: a soft wash and a "You" tag */
+.table tbody tr.you {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Member: avatar, name, team (laid out inside the cell, so the cell stays
+   a table cell and the row lines run straight) */
+.memberCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.memberText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.youTag {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.team {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Status: a coloured pill with a dot */
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.state i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Busy: a ticket ongoing, in red. Available: none, in green. */
+.busy {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+.available {
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+  color: var(--green);
+}
+
+/* Working on: the ticket, its phase (and revision), its title under it */
+.workingOn {
+  width: 40%;
+  min-width: 0;
+}
+
+.ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ticketLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.key {
+  color: var(--accent-hover);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.phase,
+.round {
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.phase {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.round {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow-wrap: anywhere;
+}
+
+/* Above the ticket: a timer running on it now (a live dot), or paused */
+.timing,
+.timingPaused {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.timing {
+  color: var(--accent-hover);
+}
+
+.timing::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+.timingPaused {
+  color: var(--orange);
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timing::before {
+    animation: none;
+  }
+}
+
+/* What someone last did: quieter than a ticket being worked on */
+.lastLine {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lastLabel {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.quiet .key {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.elapsed {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.elapsedPaused {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.none {
+  color: var(--text-muted);
+}
+
+/* Ongoing tickets: the count, then any on hold under it */
+.ongoing {
+  font-weight: 600;
+}
+
+.onHold {
+  display: block;
+  margin-top: 2px;
+  color: var(--orange);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Narrow: one card per person. Name and status on top, the ticket under,
+   then time on it, today and open tickets side by side with their names */
+@container team (max-width: 720px) {
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 12px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .table td {
+    padding: 0 !important;
+    border: none;
+  }
+
+  .memberCell {
+    grid-column: 1 / 3;
+    width: auto;
+  }
+
+  .member {
+    min-width: 0;
+  }
+
+  /* Status beside the name, at the right */
+  .table td[data-label='Status'] {
+    grid-column: 3;
+    justify-self: end;
+    align-self: center;
+  }
+
+  .workingOn {
+    grid-column: 1 / -1;
+    width: auto;
+  }
+
+  .table td.num {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left !important;
+  }
+
+  .table td.num::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+}

@@ -173,9 +173,10 @@ type Props = {
   // The same per round, on each line of a ticket's breakdown
   onEditRound?: (row: TicketRow, round: number, field?: string) => void
   onDeleteRound?: (row: TicketRow, round: number) => void
-  // Adds a button beside Edit that starts the ticket's next revision; on a
-  // spec ticket, the button adds a ticket under it instead
-  onAddRound?: (row: TicketRow) => Promise<void>
+  // Adds a button beside Edit that starts the ticket's next revision (the
+  // page asks which review requested the changes first); on a spec ticket,
+  // the button adds a ticket under it instead
+  onAddRound?: (row: TicketRow) => void
   onAddChild?: (spec: TicketRow) => void
   // Makes a child spec a parent: it's dragged out of any parent
   onMakeParent?: (row: TicketRow) => Promise<void>
@@ -580,8 +581,6 @@ export default function TicketTimelineSheet(props: Props) {
     dropKey !== null && !dropKey.startsWith('out') && specFor(t) !== null && familyKey(t) === dropKey
   const isDragOut = dropKey !== null && dropKey.startsWith('out')
 
-  // The ticket whose revision is being added
-  const [addingKey, setAddingKey] = useState<string | null>(null)
   // Why a ticket can't get a revision now, or '' if it can
   const cantAddRound = (t: TicketRow) => {
     const rounds = roundsOf(t)
@@ -593,18 +592,12 @@ export default function TicketTimelineSheet(props: Props) {
     if (last && last.round > 1 && last.hours <= 0) return `${roundLabel(last.round)} has no time yet`
     return ''
   }
-  // Adds it, then opens the breakdown to show the new round
-  const addRound = async (t: TicketRow) => {
-    if (!onAddRound || addingKey) return
-    setAddingKey(t.ticketKey)
-    try {
-      await onAddRound(t)
-      setExpanded((prev) => new Set(prev).add(t.ticketKey))
-    } catch {
-      // The page shows what went wrong
-    } finally {
-      setAddingKey(null)
-    }
+  // Asks for the review that requested changes, and opens the breakdown so
+  // the new round shows once it's added
+  const addRound = (t: TicketRow) => {
+    if (!onAddRound) return
+    onAddRound(t)
+    setExpanded((prev) => new Set(prev).add(t.ticketKey))
   }
 
   const toggle = (key: string) =>
@@ -1402,7 +1395,7 @@ export default function TicketTimelineSheet(props: Props) {
                               className={styles.rowAction}
                               title={cantAddRound(t) || `Add ${roundLabel(latestRound(t) + 1)}`}
                               onClick={() => addRound(t)}
-                              disabled={Boolean(cantAddRound(t)) || addingKey === t.ticketKey}
+                              disabled={Boolean(cantAddRound(t))}
                               aria-label={`Add a revision to ${t.ticketKey}`}
                             >
                               <Icon name="plus" size={16} />

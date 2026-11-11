@@ -204,8 +204,12 @@ var workflows = map[TicketType]Workflow{
 				Hint: "Cho-san reviews the revised issue. Approving finishes the ticket.", ChangesNewRound: true},
 		},
 	},
+	// Planning comes once the leads have confirmed the spec, and again first
+	// thing in a review-back: changes asked for are planned before coding
 	TypeImplementation: {
 		First: append(opening(),
+			FlowStep{Key: "plan", Label: "Plan", Who: you, Kind: StepWork, Phase: PhasePlanning,
+				Hint: "Plan how you’ll change the code, now that the leads have confirmed the spec."},
 			FlowStep{Key: "code", Label: "Code", Who: you, Kind: StepWork, Phase: PhaseCoding,
 				Hint: "Implement the change locally."},
 			FlowStep{Key: "test", Label: "Test", Who: you, Kind: StepWork, Phase: PhaseTesting,
@@ -221,6 +225,8 @@ var workflows = map[TicketType]Workflow{
 				Hint: "Everything is resolved: close the PR and the issue. This finishes the ticket."},
 		),
 		Again: []FlowStep{
+			{Key: "plan", Label: "Plan", Who: you, Kind: StepWork, Phase: PhasePlanning,
+				Hint: "Plan how you’ll change the code for what the review asked."},
 			{Key: "revise_code", Label: "Revise code", Who: you, Kind: StepWork, Phase: PhaseCoding,
 				Hint: "Change the code as Cho-san asked."},
 			{Key: "test", Label: "Test", Who: you, Kind: StepWork, Phase: PhaseTesting,
@@ -237,8 +243,12 @@ var workflows = map[TicketType]Workflow{
 				Hint: "Cho-san does the review. Mark it done when Cho-san has finished.", ApproveLabel: "Review done"},
 		),
 	},
+	// Like an implementation: planned once the leads have confirmed the issue,
+	// and planned again when Cho-san asks for changes
 	TypeIntegration: {
 		First: append(opening(),
+			FlowStep{Key: "plan", Label: "Plan", Who: you, Kind: StepWork, Phase: PhasePlanning,
+				Hint: "Plan what you’ll test on staging, now that the leads have confirmed the issue."},
 			FlowStep{Key: "staging_test", Label: "Test on staging", Who: you, Kind: StepWork, Phase: PhaseTesting,
 				Hint: "Test the changes in the staging environment."},
 			FlowStep{Key: "cho_results", Label: "Cho-san reviews results", Who: choSan, Kind: StepReview,
@@ -246,6 +256,8 @@ var workflows = map[TicketType]Workflow{
 				ChangesNewRound: true},
 		),
 		Again: []FlowStep{
+			{Key: "plan", Label: "Plan", Who: you, Kind: StepWork, Phase: PhasePlanning,
+				Hint: "Plan the retest for what Cho-san asked."},
 			{Key: "retest", Label: "Retest on staging", Who: you, Kind: StepWork, Phase: PhaseTesting,
 				Hint: "Test again on staging after the requested changes."},
 			{Key: "cho_results", Label: "Cho-san reviews results", Who: choSan, Kind: StepReview, Phase: PhaseReview,
