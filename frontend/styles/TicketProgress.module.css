@@ -1,0 +1,615 @@
+/* The progress pop-up: ticket facts, the steps, the current step's panel,
+   and Previous / Skip at the bottom */
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin: -6px 0 24px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* The step's content, set off from the steps by a single rule */
+.panel {
+  margin-top: 24px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  /* One fixed size for every step, so the pop-up never grows or shrinks
+     moving between them: room for the tallest (a review with a long hint,
+     its time, result and comment, or a work step's two cards). Anything
+     longer scrolls inside rather than resizing the pop-up. */
+  height: 400px;
+  overflow-y: auto;
+  /* Room so focus rings at the edges aren't clipped by the scrolling,
+     taken back so the content lines up as before */
+  margin-inline: -6px;
+  padding-inline: 6px;
+  padding-bottom: 6px;
+}
+
+/* Every step fills the panel the same way: its name and description at the
+   top, what to do in the middle, and its button at the bottom, where the
+   other steps have theirs, so moving between steps nothing jumps */
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel > .panelHeader {
+  flex: none;
+}
+
+/* Work: the two cards take the rest of the height */
+.panel > .ways {
+  flex: 1;
+}
+
+/* In each card the label sits at the top and the line under it at the
+   bottom, with the clock (or the time box) centred between, level with
+   each other */
+.way:not(.typed) > .timer {
+  margin-block: auto;
+}
+
+.typed {
+  grid-template-rows: auto 1fr auto;
+}
+
+/* A review: one card like a work step's, filling the same space, with its
+   time and result at the top and the comment and Record result at the
+   bottom */
+.panel > .form {
+  flex: 1;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.panel > .form > .commentRow {
+  margin-top: auto;
+}
+
+/* A one-click step: Mark as done at the bottom right */
+.panel > .formActions {
+  margin-top: auto;
+}
+
+/* The ticket finished: a check and its summary, in the middle */
+.panel > .finished {
+  flex-direction: column;
+  margin: auto;
+  text-align: center;
+}
+
+.panel > .finished .finishedIcon {
+  width: 56px;
+  height: 56px;
+}
+
+/* Another step, read only: what's on it fills the middle, centred, with
+   the way back to the current step at the bottom */
+.panel > .previewBody {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.panel > .previewBody + button {
+  align-self: flex-start;
+}
+
+/* A narrower pop-up: a review's result choices can wrap onto a second row,
+   so every step gets that much more room (still one size for all) */
+@media (max-width: 1000px) {
+  .panel {
+    height: 440px;
+  }
+}
+
+/* There, a narrower time box leaves the choices room for two rows, not
+   three (inside the panel, so it outranks the wider rule further down; a
+   phone's stacked layout, below 601px, is left alone) */
+@media (min-width: 601px) and (max-width: 1000px) {
+  .panel .reviewRow {
+    grid-template-columns: 180px minmax(0, 1fr);
+    column-gap: 24px;
+  }
+}
+
+/* On a phone the cards stack, so no one height fits every step: the panel
+   takes its content's height and the pop-up scrolls */
+@media (max-width: 640px) {
+  .panel {
+    height: auto;
+    min-height: 280px;
+    overflow-y: visible;
+  }
+}
+
+.panelHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 28px;
+}
+
+.panelHeader h3 {
+  margin: 8px 0 6px;
+  font-size: 1.2rem;
+}
+
+/* The step's description: a comfortable line length, with room between
+   lines */
+.panelHeader .hint {
+  max-width: 62ch;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+/* "Step 1 of 3 · You": a small caps line above the step's name */
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* Your own work: two ways to log its time, side by side as equal cards
+   (one across when the timer is running) */
+.ways {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.ways > :only-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .ways {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.way {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+/* The timer running on this step */
+.wayActive {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+/* Matches the time box's label in the other card */
+.wayLabel {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* A big clock with Start or End beside it */
+.timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.clock {
+  color: var(--text-muted);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.running {
+  color: var(--text);
+}
+
+.timerButtons {
+  display: flex;
+  gap: 8px;
+}
+
+/* The confirmation and review: time and result side by side, then the
+   comment with the button to record it */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reviewRow {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px 40px;
+}
+
+@media (max-width: 600px) {
+  .reviewRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Laid out like the time box beside it: label, choices, a line under */
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resultLabel {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.resultHint {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.commentRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.commentRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Outcomes as one row of choices; the chosen one's effect shows below */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form + .form {
+  margin-top: 14px;
+}
+
+.choice {
+  position: relative;
+  padding: 8px 18px;
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.choice:hover {
+  border-color: var(--accent);
+}
+
+/* The radio itself is hidden; the whole choice is clickable and keyboard
+   arrows still move between them */
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chosen,
+.chosen:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 14px;
+}
+
+.finished {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.finished h3 {
+  font-size: 1.1rem;
+}
+
+.finishedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--green) 18%, transparent);
+  color: var(--green);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* The buttons' height, which two lines of error also fit in */
+  height: 40px;
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  box-sizing: content-box;
+}
+
+/* A step that couldn't be saved says why here, between Previous and Skip,
+   so the pop-up keeps its size; two lines at most, all of it on hover */
+.footerError {
+  display: -webkit-box;
+  flex: 1;
+  overflow: hidden;
+  margin: 0;
+  color: var(--pink);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* The edit pop-up's review-back timeline: a tab per round, like the index
+   tabs on a booklet. The chosen tab is part of its page (the times below):
+   same soft purple, same thin edge, no line between them. The other tabs
+   are plain text until hovered. */
+.roundTabs {
+  --page-bg: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  --page-edge: color-mix(in srgb, var(--accent) 35%, var(--border));
+
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px;
+  margin: -8px 0 0;
+  padding: 0 14px;
+}
+
+.roundTab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: -1px;
+  padding: 9px 16px 10px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.roundTab:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  color: var(--text);
+}
+
+.roundTab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Covers the page's top edge where it sits, so tab and page read as one */
+.activeTab,
+.activeTab:hover {
+  border-color: var(--page-edge);
+  background: var(--page-bg);
+  color: var(--accent-hover);
+}
+
+.tabTotal {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.activeTab .tabTotal {
+  color: var(--text);
+}
+
+/* "New review-back": a quiet text button after the tabs */
+.addTab {
+  align-self: center;
+  margin-bottom: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.addTab:hover:not(:disabled) {
+  color: var(--accent-hover);
+}
+
+.addTab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.addTab:disabled:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* Every phase's total for the round on the tab, three to a row, on the
+   tab's page */
+.times {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 16px;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
+@media (max-width: 700px) {
+  .times {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The ticket's details under the times */
+.details {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.detailsTitle {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+/* Title, status and dates on one row (the title wider); two to a row on a
+   narrow screen */
+.detailsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .detailsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* SPinno typed tickets' steps (TicketFlowDialog) */
+
+/* The ticket's type, beside its status */
+.typeChip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* The time typed in: label, then the box with its button beside it, and
+   the box's note under it */
+.typed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.typed > :first-child {
+  display: contents;
+}
+
+.typed > :first-child > * {
+  grid-column: 1;
+}
+
+.typed > :first-child > label {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.typed > button {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+/* Looking at a step other than the current one: read only */
+.previewTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.previewBody {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.previewBody p {
+  margin: 2px 0 0;
+}
+
+.previewIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gray) 16%, transparent);
+  color: var(--text-muted);
+}
+
+.previewDone {
+  background: color-mix(in srgb, var(--green) 18%, transparent);
+  color: var(--green);
+}

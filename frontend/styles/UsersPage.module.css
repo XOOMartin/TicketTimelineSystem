@@ -1,0 +1,77 @@
+/* The admin's user management: tags for team and role, a fixed actions
+   column so every row's buttons line up, and a compact empty state. */
+
+.hint {
+  margin: -4px 0 12px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.you {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.date {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Both tables (accounts and deleted accounts) share these column widths,
+   so their columns line up one above the other */
+.table {
+  table-layout: fixed;
+  min-width: 860px;
+}
+
+.colUser {
+  width: 30%;
+}
+
+.colTeam,
+.colRole {
+  width: 13%;
+}
+
+.colDate {
+  width: 19%;
+}
+
+/* Wide enough for Restore and Delete permanently */
+.colActions {
+  width: 290px;
+}
+
+.actionsCell {
+  white-space: nowrap;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: end;
+  gap: 6px;
+}
+
+.deletedRow td {
+  background: color-mix(in srgb, var(--pink) 3%, transparent);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

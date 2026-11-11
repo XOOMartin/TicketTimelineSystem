@@ -1,0 +1,20 @@
+/* A search field with its magnifier inside, on the left. Its width comes
+   from where it sits (a class passed in). */
+.search {
+  position: relative;
+  display: block;
+  color: var(--text-muted);
+}
+
+.search svg {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search input {
+  width: 100%;
+  padding-left: 38px;
+}

@@ -1,0 +1,59 @@
+.timeline {
+  min-width: 160px;
+}
+
+.bar {
+  display: flex;
+  height: 6px;
+  gap: 2px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.segment {
+  height: 100%;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 3px;
+  border-radius: 2px;
+}
+
+/* One colour per phase, in workflow order */
+.investigation {
+  background: #8f7cf8;
+}
+
+.confirmation {
+  background: #ef4f8b;
+}
+
+.planning {
+  background: #f6a75c;
+}
+
+.coding {
+  background: #5b9dff;
+}
+
+.testing {
+  background: #3ccf91;
+}
+
+.review {
+  background: #a0a6c0;
+}

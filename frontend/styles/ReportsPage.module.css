@@ -1,0 +1,42 @@
+/* The saved reports card: its title, and generating a new one on the right */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.toolbar h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* Report, day, Generate in one row */
+.generator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.generator .kind {
+  width: auto;
+  min-width: 120px;
+}
+
+.generator .day {
+  width: 160px;
+}
+
+/* About automatic reports, on hover */
+.info {
+  display: inline-flex;
+  color: var(--text-muted);
+  cursor: help;
+}
+
+.view {
+  min-width: 0;
+}

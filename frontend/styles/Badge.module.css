@@ -1,0 +1,64 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.gray {
+  background: rgba(138, 143, 168, 0.16);
+  color: var(--tone-gray);
+}
+
+.blue {
+  background: rgba(123, 97, 255, 0.18);
+  color: var(--tone-blue);
+}
+
+.amber {
+  background: rgba(246, 167, 92, 0.16);
+  color: var(--orange);
+}
+
+.red {
+  background: rgba(239, 79, 139, 0.16);
+  color: var(--pink);
+}
+
+.green {
+  background: rgba(60, 207, 145, 0.14);
+  color: var(--green);
+}
+
+.sky {
+  background: rgba(91, 157, 255, 0.16);
+  color: var(--blue);
+}
+
+/* Teams and roles: SPinno's teal, BlackBox's near-black, an admin's accent */
+.teal {
+  background: color-mix(in srgb, var(--teal) 14%, transparent);
+  color: var(--teal);
+}
+
+.ink {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  color: var(--text);
+}
+
+.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}

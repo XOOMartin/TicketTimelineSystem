@@ -1,0 +1,136 @@
+.stepper {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* The line from this step's circle to the next one's */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border-strong);
+}
+
+/* Filled in up to the current step, in a softer shade */
+.done:not(:last-child)::after,
+.skipped:not(:last-child)::after {
+  background: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+button.marker:not(:disabled) {
+  cursor: pointer;
+}
+
+button.marker:not(:disabled):hover .circle {
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+button.marker:focus-visible {
+  outline: none;
+}
+
+button.marker:focus-visible .circle {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--input-border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: box-shadow 0.15s;
+}
+
+/* Done: a light tint with a tick */
+.done .circle {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+/* Skipped: passed, nothing logged */
+.skipped .circle {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--text-muted);
+}
+
+/* The one step that's solid, so it's where the eye goes */
+.current .circle {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.done .label,
+.current .label {
+  color: var(--text);
+}
+
+.detail {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Where the step's time goes in the table, e.g. "→ Spec" */
+.column {
+  font-weight: 500;
+}
+
+/* The step being looked at, when it isn't the current one: a ring and its
+   label in the accent colour */
+.viewing:not(.current) .circle {
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px var(--accent);
+}
+
+.viewing .label {
+  color: var(--accent);
+}

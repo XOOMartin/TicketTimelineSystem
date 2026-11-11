@@ -1,0 +1,22 @@
+.panel {
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 12px 8px;
+  font-size: 0.75rem;
+  color: #57606a;
+}
+
+.list {
+  max-height: 70vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}

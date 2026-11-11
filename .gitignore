@@ -1,0 +1,21 @@
+# Secrets — never commit (holds POSTGRES_PASSWORD)
+.env
+.env.*
+
+# Local databases and backups
+data/
+
+# Go build output
+/server
+/sqlite-to-postgres
+*.exe
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

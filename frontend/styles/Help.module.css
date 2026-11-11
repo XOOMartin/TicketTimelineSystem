@@ -1,0 +1,103 @@
+/* Help: the definitions of terms, one card per group */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+}
+
+/* The search box's width (its look is SearchBox's) */
+.search {
+  flex: 0 1 320px;
+}
+
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.9rem;
+}
+
+.jump a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.jump a:hover {
+  color: var(--accent);
+}
+
+.group {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  scroll-margin-top: 16px;
+}
+
+.group > h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.intro {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.terms {
+  margin: 0;
+}
+
+/* Term on the left, its definition beside it; stacked when narrow */
+.term {
+  display: grid;
+  grid-template-columns: minmax(160px, 240px) minmax(0, 1fr);
+  gap: 4px 24px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.term:first-child {
+  margin-top: 12px;
+}
+
+.term dt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.term dd {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.aka {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 640px) {
+  .term {
+    grid-template-columns: 1fr;
+  }
+}

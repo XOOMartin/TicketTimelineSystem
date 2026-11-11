@@ -1,0 +1,1329 @@
+/* Follows the column order of the Ticket_Progress_Timeline spreadsheet tabs,
+   compact enough to fit the page without scrolling sideways */
+
+.wrap {
+  container: sheet / inline-size;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  /* Only a safety net: the columns are sized to fit, and narrow screens
+     switch to cards */
+  overflow-x: auto;
+}
+
+/* The table's title, with the search box on the right */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 14px 18px 6px;
+}
+
+.caption {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Search, status filter and sort: one row on the right of the title (the
+   search box gives up width first), under it on a narrow screen */
+.controls {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  /* The menus as tall as the search box */
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* The search box's width beside the menus (its look is SearchBox's) */
+.search {
+  flex: 1 1 260px;
+  min-width: 230px;
+}
+
+/* More specific than the input's full width, so the menus sit side by side */
+.controls .filter {
+  flex: none;
+  width: auto;
+  min-width: 140px;
+}
+
+/* One day picked: only the tickets on the go that day; × clears it */
+.dateFilter {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.controls .dateFilter input {
+  width: 150px;
+}
+
+.dateFilterOn input {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+
+.dateClear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dateClear:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* Phone width: the row can't fit, so the menus go under the search */
+@container sheet (max-width: 600px) {
+  .controls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .search {
+    flex-basis: 100%;
+  }
+
+  /* Status and sort share the row under it */
+  .controls .filter {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+/* "Show all" in the no-matches message */
+.clearFilters {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-hover);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clearFilters:hover {
+  text-decoration: underline;
+}
+
+/* Under the table: which tickets are showing, and the pages */
+/* Count on the left, page buttons in the middle of the table (an empty
+   right column the same width as the left keeps them centred) */
+.pager {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 16px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.pageInfo {
+  grid-column: 1;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pages {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Tickets to a page, at the right end */
+.pageSize {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.pager .pageSizeSelect {
+  width: auto;
+  min-width: 70px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Narrow: the buttons centred on their own line, the count under them */
+@media (max-width: 640px) {
+  .pager {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .pageInfo,
+  .pages,
+  .pageSize {
+    grid-column: 1;
+  }
+
+  .pages {
+    order: -1;
+  }
+}
+
+.pageButton {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.pageButton:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.pageButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.currentPage,
+.currentPage:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.gap {
+  padding: 0 4px;
+  color: var(--text-muted);
+}
+
+.sheet {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.sheet th,
+.sheet td {
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.sheet th {
+  padding-top: 8px;
+  padding-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  vertical-align: bottom;
+}
+
+/* Section names above the columns, each underlined across its columns */
+.sheet .groups th {
+  padding: 10px 8px 0;
+  border-bottom: none;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.sheet .groups th > span {
+  display: block;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.sheet th:first-child,
+.sheet td:first-child {
+  padding-left: 18px;
+}
+
+.sheet th:last-child,
+.sheet td:last-child {
+  padding-right: 18px;
+}
+
+.sheet tbody tr {
+  transition: background 0.12s;
+}
+
+.sheet tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sheet tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* A row that opens its rounds when clicked */
+.sheet .clickable {
+  cursor: pointer;
+}
+
+.sheet .editing,
+.sheet .editing:hover {
+  background: var(--accent-soft);
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Phase times and review-backs: left-aligned under their headers */
+.time {
+  text-align: left !important;
+  white-space: nowrap;
+}
+
+/* Their headers may wrap ("Review-/backs") so the column isn't wider than
+   its numbers */
+.sheet th.time {
+  white-space: normal;
+}
+
+/* Start, before the ticket: opens its progress steps and timer. Solid while
+   that ticket is being timed. */
+.start {
+  width: 1%;
+  /* A little room before the ticket column */
+  padding-right: 12px !important;
+}
+
+/* The play button, a real button: solid purple with a white triangle and a
+   soft shadow; darker and lifted on hover, pressed in on click. While that
+   ticket is being timed it's a red stop button, gently pulsing. */
+.startButton {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 40%, transparent);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+
+.startButton svg {
+  /* The triangle's weight sits left of its box: nudge it to look centred */
+  margin-left: 2px;
+  fill: currentColor;
+}
+
+.startButton:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 50%, transparent);
+  transform: translateY(-1px) scale(1.06);
+}
+
+.startButton:active:not(:disabled) {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: scale(0.96);
+}
+
+.startButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.startButton.timing,
+.startButton.timing:hover:not(:disabled) {
+  background: var(--red);
+  color: #fff;
+  animation: timingPulse 1.8s ease-out infinite;
+}
+
+.startButton.timing:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--red) 85%, #000);
+}
+
+/* The square sits centred, unlike the play triangle */
+.startButton.timing svg {
+  margin-left: 0;
+}
+
+@keyframes timingPulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 50%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startButton.timing {
+    animation: none;
+  }
+}
+
+/* A round that's behind the ticket shows a quiet tick where its play button
+   was, the same size, so the column stays lined up */
+.roundDone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 50%;
+  color: var(--accent-hover);
+}
+
+/* Edit and Delete, at the end of the row */
+.action {
+  width: 1%;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+/* Plain icons, so a column of them doesn't crowd the numbers */
+.rowAction {
+  width: 32px;
+  height: 32px;
+  color: var(--text-muted);
+}
+
+.rowAction:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.deleteAction:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+/* The ticket: its title (two lines at most), then one quiet line with its
+   number, project and note. Both cut off with "…" (full text on hover)
+   rather than taking the width the phases need. */
+.ticket {
+  width: 26%;
+  min-width: 180px;
+}
+
+.ticketLine {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.ticketText {
+  min-width: 0;
+}
+
+.title,
+.meta {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow-wrap: anywhere;
+}
+
+.title {
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.4;
+  -webkit-line-clamp: 2;
+}
+
+.meta {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.meta > span + span::before {
+  content: '·';
+  margin: 0 6px;
+  color: var(--border-strong);
+}
+
+.number {
+  color: var(--accent-hover);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.remarks {
+  font-style: normal;
+}
+
+.status,
+.dates {
+  white-space: nowrap;
+}
+
+/* Under a header: the widest values its column can hold, stacked,
+   invisible and taking no height. The column is always that wide, so a
+   value changing (a status, an end date set or cleared) never moves the
+   columns. In the body's size and weight, not the header's. */
+.sizer {
+  display: grid;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-size: 0.9rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.dates span {
+  display: block;
+}
+
+.end {
+  color: var(--text-muted);
+}
+
+/* Phase header: the same coloured dot as the "Hours by task" chart */
+.phaseHead {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.phaseHead i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Time on a phase, on a wash of that phase's colour */
+.pill {
+  display: inline-block;
+  min-width: 44px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A phase not started, or no review-backs: present but quiet */
+.none {
+  color: var(--border-strong);
+  font-weight: 700;
+}
+
+/* Review-backs: a pill that also opens the ticket's rounds */
+.backs {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--orange) 18%, transparent);
+  color: var(--orange);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.backs:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--orange) 30%, transparent);
+}
+
+.backs:disabled {
+  cursor: default;
+}
+
+/* The breakdown arrow before a ticket number */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.toggle:focus-visible,
+.backs:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.toggle svg {
+  transition: transform 0.15s ease;
+}
+
+.toggle.open svg {
+  transform: rotate(90deg);
+}
+
+/* Keeps ticket numbers lined up when only some rows have an arrow */
+.toggleSpace {
+  flex: none;
+  width: 22px;
+}
+
+/* A round under its ticket, like a page tucked under it: a purple wash,
+   indented and smaller, with a ribbon down the left edge like a bookmark */
+.sheet .roundRow td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-bottom-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  font-size: 0.85rem;
+}
+
+.sheet .roundRow:hover td {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.sheet .roundRow td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* The round's name as a tab on its page */
+.roundName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 6px;
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+
+/* "Original" or "Revision N" as a small chip: revisions in the accent, the
+   original work quieter, so the rework stands out in the breakdown */
+.roundChip {
+  padding: 2px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent-hover);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.roundChip.original {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* An "L" joining the round to its ticket above */
+.branch {
+  width: 10px;
+  height: 12px;
+  margin-top: -10px;
+  border-bottom: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-bottom-left-radius: 4px;
+}
+
+.roundTotal {
+  font-weight: 600;
+}
+
+.total {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Thin bar under the total: the ticket's time split by phase */
+.split {
+  display: flex;
+  gap: 2px;
+  width: 64px;
+  height: 4px;
+  margin: 6px 0 0 auto;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.split i {
+  flex-basis: 0;
+  min-width: 3px;
+}
+
+/* Not enough room for every column (with Start, Edit and Delete the table
+   needs about 1060px): one card per ticket, rather than scrolling sideways */
+@container sheet (max-width: 1080px) {
+  .sheet thead {
+    display: none;
+  }
+
+  .sheet,
+  .sheet tbody {
+    display: block;
+  }
+
+  .sheet tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sheet tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .sheet td,
+  .sheet td:first-child,
+  .sheet td:last-child {
+    display: block;
+    padding: 0;
+    border: none !important;
+    text-align: left !important;
+  }
+
+  .sheet td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Ticket across the top, then status, dates and total, then the phases
+     and review-backs, with Edit last */
+  .ticket {
+    grid-column: 1 / -1;
+    width: auto;
+    min-width: 0;
+  }
+
+  /* Start in the card's top corner, clear of the title */
+  .sheet td.start {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    width: auto;
+    padding-right: 0 !important;
+  }
+
+  .start + .ticket {
+    padding-right: 44px;
+  }
+
+  .status {
+    order: 1;
+  }
+
+  .dates {
+    order: 2;
+  }
+
+  .dates span {
+    display: inline;
+  }
+
+  .dates .end {
+    margin-left: 4px;
+  }
+
+  .total {
+    order: 3;
+  }
+
+  .split {
+    margin-left: 0;
+  }
+
+  .phase {
+    order: 4;
+  }
+
+  .review {
+    order: 5;
+  }
+
+  .roundTotal {
+    order: 3;
+  }
+
+  /* Rounds as cards under their ticket, on the same grid so every value
+     sits under the matching one above */
+  .sheet tbody .roundRow {
+    padding: 12px 18px 14px;
+    border-bottom-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+
+  .sheet tbody .roundRow:hover {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .sheet .roundRow td,
+  .sheet .roundRow:hover td,
+  .sheet .roundRow td:first-child {
+    background: none;
+    box-shadow: none;
+  }
+
+  /* Empty cells drop out, except the one keeping Status's place */
+  .blank:not(.status) {
+    display: none !important;
+  }
+
+  /* Beside review-backs, at the end of the card */
+  /* Always the last two columns, so round cards (no review-backs cell)
+     keep them on the right too */
+  .action {
+    grid-column: 2 / -1;
+    order: 6;
+    justify-self: end;
+    align-self: end;
+    width: auto;
+  }
+}
+
+/* A cell being edited in place, after a double-click: a small box saved
+   with Enter or by clicking away, Esc to cancel. The cell keeps its own
+   content (hidden) so the columns don't move; the box floats over it,
+   inside the cell. */
+.cellEditing {
+  position: relative;
+}
+
+.cellKeep {
+  visibility: hidden;
+}
+
+.cellInput,
+.cellSelect {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 3px;
+  width: calc(100% - 6px);
+  min-width: 0;
+  height: 30px;
+  margin: 0;
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+  transform: translateY(-50%);
+}
+
+.sheet .cellSelect {
+  height: 30px;
+  padding: 0 4px;
+}
+
+/* The title's box covers the hidden title, up to its two lines, so a long
+   title shows whole while it's edited */
+.titleInput {
+  top: -5px;
+  left: -7px;
+  width: calc(100% + 14px);
+  height: calc(100% + 10px);
+  min-height: 32px;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  transform: none;
+}
+
+.cellInput:disabled,
+.cellSelect:disabled {
+  opacity: 0.6;
+}
+
+.cellInvalid {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
+}
+
+/* What's wrong, just under the box, over the row below */
+.cellError {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% + 19px);
+  left: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--error-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Cards (narrow screens): no columns to keep, and each value has its label
+   above it, so the box sits where the value is, at a usable size */
+@container sheet (max-width: 1080px) {
+  .cellInput,
+  .cellSelect {
+    top: auto;
+    bottom: -2px;
+    left: 0;
+    width: 130px;
+    transform: none;
+  }
+
+  .sheet .cellSelect {
+    width: 160px;
+  }
+
+  .titleInput {
+    top: -5px;
+    bottom: auto;
+    left: -7px;
+    width: calc(100% + 14px);
+  }
+
+  .cellError {
+    top: calc(100% + 4px);
+    left: 0;
+  }
+}
+
+/* SPinno repos: a small coloured chip after the project */
+.repoChip {
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--gray) 18%, transparent);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.repo_spec {
+  background: color-mix(in srgb, var(--violet) 18%, transparent);
+  color: var(--accent-hover);
+}
+
+.repo_backend {
+  background: color-mix(in srgb, var(--blue) 18%, transparent);
+  color: var(--blue);
+}
+
+.repo_web {
+  background: color-mix(in srgb, var(--green) 18%, transparent);
+  color: var(--green);
+}
+
+/* "↳ Spec #45" on a ticket whose spec isn't in the table, and "2 issues
+   under it" on a spec ticket */
+.parentNote {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* A spec ticket's backend and web tickets, indented under it with a line
+   joining them, like a tree */
+.sheet .childRow td {
+  background: color-mix(in srgb, var(--surface-2) 40%, transparent);
+}
+
+/* Each spec up indents a ticket one more step (--depth, set on the row) */
+.childRow .ticketLine {
+  position: relative;
+  padding-left: calc(var(--depth, 1) * 24px);
+}
+
+.childRow .ticketLine::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: calc((var(--depth, 1) - 1) * 24px + 6px);
+  width: 12px;
+  height: 27px;
+  border-bottom: 2px solid var(--border-strong);
+  border-left: 2px solid var(--border-strong);
+  border-bottom-left-radius: 5px;
+}
+
+/* No rule between a spec ticket and the first ticket under it */
+.sheet .parentRow td {
+  border-bottom-color: transparent;
+}
+
+/* The repo chip leads the line, so the number after it needs no dot */
+.meta > .parentTag + span::before,
+.meta > .repoChip + span::before {
+  content: none;
+}
+
+/* A backend or web ticket with no spec yet: quieter than one with a spec */
+.noParent {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* The spec number being typed in, inside the quiet line under the title */
+.parentInput {
+  width: 96px;
+  height: 22px;
+  margin: -2px 0;
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+  vertical-align: baseline;
+}
+
+/* While the spec is typed in, the quiet line isn't cut off, so the box and
+   any message show whole */
+.sheet .metaEditing {
+  display: block;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+/* Only the repo, number and box while editing, so it stays one line */
+.metaEditing > span:not(.repoChip):not(.number):not(.cellEditing) {
+  display: none;
+}
+
+/* Under a spec ticket's total: how much is its own and how much the tickets
+   under it */
+.familySplit {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Dragging a backend or web ticket onto a spec ticket */
+.wrap {
+  position: relative;
+}
+
+/* A backend or web ticket's row can be picked up and dragged */
+.sheet .movable {
+  cursor: grab;
+}
+
+.sheet .movable:active {
+  cursor: grabbing;
+}
+
+/* The ticket being dragged stays in place, faded */
+.sheet .dragging td {
+  opacity: 0.45;
+}
+
+/* The spec family it would go under: outlined in purple */
+.sheet .dropTarget td {
+  background: var(--accent-soft);
+}
+
+.sheet .dropTarget td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* "Drop here to take it out": floats over the table's title row, so the
+   table doesn't move when a drag starts */
+.dropOut {
+  position: absolute;
+  z-index: 5;
+  top: 8px;
+  right: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dropOutOver {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent-hover);
+}
+
+/* A ticket outside any spec, as a place to drop a ticket out of its spec */
+.sheet .dropOutRow td {
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+
+.sheet .dropOutRow td:first-child {
+  box-shadow: inset 3px 0 0 var(--border-strong);
+}
+
+/* The card that follows the pointer while a ticket is dragged: only that
+   ticket. It's drawn off screen; the browser shows a picture of it. */
+.dragGhost {
+  position: fixed;
+  top: -200px;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 340px;
+  padding: 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.dragGhost .repoChip {
+  margin-right: 0;
+}
+
+.dragGhostTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The rounds of a ticket under a spec: one step further in, so their "L"
+   hangs from that ticket's arrow (past its own connector), not the spec's */
+.childRounds .roundName {
+  padding-left: calc(var(--depth, 1) * 24px + 6px);
+}
+
+/* A spec ticket's breakdown ends with its issues' time, set apart from its
+   own rounds */
+.sheet .issuesRow td {
+  border-top: 1px dashed color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+.issuesCount {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 0.75rem;
+}
+
+/* Cells a double-click edits: the text cursor, as over an input */
+.sheet td.editableCell {
+  cursor: text;
+}
+
+.sheet .editableText {
+  cursor: text;
+}
+
+/* Under a spec's box: what's typed is its own time; its issues add on */
+.cellHint {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% + 19px);
+  left: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Keeps Edit and Delete lined up on a spec ticket, which has no + button */
+.rowActionSpace {
+  display: inline-block;
+  width: 32px;
+}
+
+/* When work began: the time of day, in the same tabular digits as the hours */
+.startedAt {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cards: a ticket under a spec is shaded as one card, not cell by cell */
+@container sheet (max-width: 1080px) {
+  .sheet tbody .childRow {
+    background: color-mix(in srgb, var(--surface-2) 40%, transparent);
+  }
+
+  .sheet .childRow td {
+    background: none;
+  }
+}
+
+/* A row of a closed breakdown (a round, or a ticket under a closed spec):
+   takes no space, but still counts toward the column widths, so opening it
+   doesn't move the columns */
+.sheet tbody .collapsed {
+  visibility: collapse;
+}
+
+/* Cards have no columns to keep: a closed breakdown's rows just go */
+@container sheet (max-width: 1080px) {
+  .sheet tbody .collapsed {
+    display: none !important;
+  }
+}
+
+/* Blank rows that keep a short page as tall as a full one (5 tickets), so
+   the table doesn't shrink and the pager stays in place. Each is the height
+   of a ticket row; no lines, no hover. */
+.sheet tbody .fillerRow,
+.sheet tbody .fillerRow:hover {
+  background: transparent;
+}
+
+.sheet tbody .fillerRow td {
+  /* A ticket row: 70px, plus its 1px dividing line */
+  height: 71px;
+  padding: 0;
+  border: 0;
+}
+
+/* Cards (narrow screens) vary in height, so there's nothing to match */
+@container sheet (max-width: 1080px) {
+  .sheet tbody .fillerRow {
+    display: none;
+  }
+}
+
+/* A SPinno ticket's type on its quiet line, e.g. "Implementation" */
+.typeTag {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* A parent someone tried to drag: a red edge and a note under its title
+   saying why it can't move, for a few seconds */
+.sheet .dragDenied td {
+  background: color-mix(in srgb, var(--pink) 8%, transparent);
+}
+
+.sheet .dragDenied td:first-child {
+  box-shadow: inset 3px 0 0 var(--pink);
+}
+
+.dragDeniedNote {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 4px 10px;
+  /* Rounded, not a pill, so it can wrap in a narrow column */
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--pink) 14%, transparent);
+  color: var(--pink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: dragDeniedIn 0.18s ease-out;
+}
+
+@keyframes dragDeniedIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+/* A parent ticket's marks: a stack where other tickets have their start
+   button, and "Parent" in its repo chip's place, both in the accent */
+.parentMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  /* Red, apart from the purple of a Spec chip and the play buttons */
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
+}
+
+.parentTag {
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--red) 16%, transparent);
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  vertical-align: 1px;
+}
+
+/* A child made a parent by dragging: amber, apart from a parent's red and
+   a spec's purple (both the mark and the chip) */
+.parentMark.standAlone,
+.parentTag.standAlone {
+  background: color-mix(in srgb, var(--orange) 20%, transparent);
+  color: var(--orange);
+}

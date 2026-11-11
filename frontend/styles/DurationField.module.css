@@ -1,0 +1,79 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.message {
+  min-height: 1.2em;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.error {
+  color: var(--pink);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--pink);
+}
+
+/* One row per phase: name | box | button, like reading across the sheet;
+   the echo or a running clock goes on a line under the box */
+.inline {
+  display: grid;
+  /* A fixed button column, so Start and the narrower End keep the boxes in
+     line from row to row */
+  grid-template-columns: minmax(0, 1fr) 110px 80px;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.inline:last-child {
+  border-bottom: none;
+}
+
+.inline .label {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.inline > button {
+  justify-content: center;
+}
+
+.inline .message {
+  grid-column: 2 / -1;
+  min-height: 0;
+}
+
+.inline .message:empty {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .inline {
+    grid-template-columns: minmax(0, 1fr) 96px 80px;
+  }
+}

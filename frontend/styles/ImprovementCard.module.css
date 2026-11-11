@@ -1,0 +1,44 @@
+.card {
+  padding: 16px;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+}
+
+.issue {
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.before,
+.after {
+  padding: 10px 12px;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.before p,
+.after p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.before {
+  background: #fdf2f2;
+}
+
+.after {
+  background: #edf7ef;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #57606a;
+}

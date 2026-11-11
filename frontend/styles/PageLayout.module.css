@@ -1,0 +1,261 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 20px;
+  width: 248px;
+  height: 100vh;
+  padding: 20px 14px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.closeNav {
+  display: none !important;
+  margin-left: auto;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profileName {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.profileMeta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navTitle {
+  margin: 12px 10px 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.navTitle:first-child {
+  margin-top: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.navLink:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.navLink.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(123, 97, 255, 0.35);
+}
+
+/* Page */
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 22px 32px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+/* The title keeps room to read; when the header is full (say, a running
+   timer as well as the page's buttons), the buttons wrap below it */
+.titles {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.subheading {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.menu {
+  display: none !important;
+}
+
+/* Uses the full width beside the sidebar, lined up with the header */
+.main {
+  flex: 1;
+  width: 100%;
+  padding: 24px 32px 48px;
+}
+
+.scrim {
+  display: none;
+}
+
+/* Small screens: the sidebar slides in over the page */
+@media (max-width: 960px) {
+  .sidebar {
+    position: fixed;
+    z-index: 30;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .open {
+    transform: none;
+  }
+
+  .scrim {
+    position: fixed;
+    z-index: 20;
+    inset: 0;
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .closeNav,
+  .menu {
+    display: inline-flex !important;
+  }
+
+  .topbar {
+    padding: 16px;
+  }
+
+  .main {
+    padding: 16px 16px 40px;
+  }
+}
+
+/* Login and signup */
+
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(123, 97, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(239, 79, 139, 0.12), transparent 40%),
+    var(--bg);
+}
+
+.authCard {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.authCard .brand {
+  padding: 0;
+  margin-bottom: 28px;
+}
+
+.authHeading {
+  font-size: 1.4rem;
+}
+
+/* Theme switch, just above Log out */
+.theme {
+  margin: 0 4px -8px;
+}

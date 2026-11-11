@@ -1,0 +1,9 @@
+.editing {
+  background: #eff6ff;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}

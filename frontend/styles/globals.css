@@ -1,0 +1,155 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+
+  --bg: #11131c;
+  --sidebar: #161925;
+  --surface: #1b1e2c;
+  --surface-2: #232738;
+  --surface-hover: #2a2e44;
+  --border: #2a2e42;
+  --border-strong: #383d57;
+  --text: #e7e9f3;
+  --text-muted: #a3a8bf;
+
+  --accent: #7b61ff;
+  --accent-hover: #8d76ff;
+  --accent-soft: rgba(123, 97, 255, 0.16);
+
+  --pink: #ef4f8b;
+  --orange: #f6a75c;
+  --violet: #8f7cf8;
+  --blue: #5b9dff;
+  --green: #3ccf91;
+  --teal: #3db9c1;
+  --amber: #f5c451;
+  --red: #f46b6b;
+  --gray: #6b7089;
+
+  /* Form fields and the panels around them */
+  --input-bg: #232738;
+  --input-border: #383d57;
+  --panel-bg: rgba(255, 255, 255, 0.025);
+
+  /* Text on tinted badges, and error text, picked per theme for contrast */
+  --tone-gray: #b4b8cc;
+  --tone-blue: #a896ff;
+  --error-text: #ff9b9b;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --backdrop: rgba(8, 9, 14, 0.7);
+}
+
+/* Set on <html> by the script in pages/_document.tsx: the saved choice, or
+   the system setting. Colours are darker than in dark mode so text on white
+   stays readable. */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f4f5f9;
+  --sidebar: #fafbfd;
+  --surface: #ffffff;
+  --surface-2: #f0f1f6;
+  --surface-hover: #e6e8f0;
+  --border: #e2e4ec;
+  --border-strong: #c9cdda;
+  --text: #1a1d2b;
+  --text-muted: #4d5269;
+
+  --accent: #6247e8;
+  --accent-hover: #5236d6;
+  --accent-soft: rgba(98, 71, 232, 0.12);
+
+  --pink: #c42a66;
+  --orange: #b35c0b;
+  --violet: #6a52d9;
+  --blue: #2563d9;
+  --green: #0f8a57;
+  --teal: #1f7f85;
+  --amber: #946c00;
+  --red: #c93838;
+  --gray: #6b7089;
+
+  --input-bg: #ffffff;
+  --input-border: #d6d9e3;
+  --panel-bg: #fafbfd;
+
+  --tone-gray: #4c5168;
+  --tone-blue: #5236d6;
+  --error-text: #b42318;
+
+  --shadow: 0 8px 24px rgba(20, 23, 40, 0.08);
+  --shadow-lg: 0 24px 64px rgba(20, 23, 40, 0.18);
+  --backdrop: rgba(20, 22, 35, 0.35);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* While a pop-up is open the page behind it stays put (only the pop-up
+   scrolls). The gutter keeps the page from shifting when its scrollbar goes. */
+html:has(dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family:
+    var(--font-sans, 'Poppins'),
+    'Hiragino Sans',
+    'Noto Sans JP',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-hover);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 2px solid var(--bg);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -1,0 +1,40 @@
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input:disabled {
+  opacity: 0.5;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+/* A field that's wrong: a red edge, and a red focus ring while fixing it */
+.input[aria-invalid='true'] {
+  border-color: var(--pink);
+}
+
+.input[aria-invalid='true']:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pink) 20%, transparent);
+}
