@@ -7,7 +7,6 @@ data/
 
 # Go build output
 /server
-/sqlite-to-postgres
 *.exe
 
 # Frontend
