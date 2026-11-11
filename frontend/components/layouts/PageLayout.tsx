@@ -31,6 +31,28 @@ const MEMBER_LINKS: NavLink[] = [
 // For everyone, admins and members
 const SUPPORT_LINKS: NavLink[] = [{ href: '/help', label: 'Help', icon: 'help' }]
 
+// Whether the sidebar is collapsed to icons, remembered in this browser. Kept
+// here too, so moving to another page doesn't flash it open again.
+const COLLAPSED_KEY = 'sidebarCollapsed'
+let collapsedPreference: boolean | null = null
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function saveCollapsed(collapsed: boolean) {
+  collapsedPreference = collapsed
+  try {
+    localStorage.setItem(COLLAPSED_KEY, collapsed ? '1' : '0')
+  } catch {
+    // Storage blocked: it stays collapsed until the page is reloaded
+  }
+}
+
 type Props = {
   title: string
   heading: string
@@ -48,6 +70,18 @@ export default function PageLayout(props: Props) {
   const { pathname, replace } = useRouter()
   const { user, isLoading, logout } = useAuth()
   const [isNavOpen, setIsNavOpen] = useState(false)
+  // Wide screens: the sidebar can shrink to its icons, giving the page more room
+  const [isCollapsed, setIsCollapsed] = useState(() => collapsedPreference ?? false)
+  useEffect(() => {
+    if (collapsedPreference === null) {
+      collapsedPreference = readCollapsed()
+      setIsCollapsed(collapsedPreference)
+    }
+  }, [])
+  const toggleCollapsed = () => {
+    saveCollapsed(!isCollapsed)
+    setIsCollapsed(!isCollapsed)
+  }
 
   const mustLogIn = !isPublic && !isLoading && !user
   useEffect(() => {
@@ -99,9 +133,11 @@ export default function PageLayout(props: Props) {
         href={link.href}
         className={link.href === pathname ? `${styles.navLink} ${styles.active}` : styles.navLink}
         aria-current={link.href === pathname ? 'page' : undefined}
+        // Collapsed, only the icon shows: the name appears on hover
+        title={isCollapsed ? link.label : undefined}
       >
         <Icon name={link.icon} />
-        {link.label}
+        <span className={styles.navLabel}>{link.label}</span>
       </Link>
     ))
 
@@ -109,10 +145,25 @@ export default function PageLayout(props: Props) {
     <>
       {head}
       <div className={styles.shell}>
-        <aside className={isNavOpen ? `${styles.sidebar} ${styles.open}` : styles.sidebar}>
+        <aside
+          className={[styles.sidebar, isNavOpen && styles.open, isCollapsed && styles.collapsed]
+            .filter(Boolean)
+            .join(' ')}
+        >
           <div className={styles.brand}>
             <span className={styles.logo}>TT</span>
-            Ticket Timeline
+            <span className={styles.brandName}>Ticket Timeline</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={styles.collapseNav}
+              onClick={toggleCollapsed}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!isCollapsed}
+              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <Icon name={isCollapsed ? 'chevronRight' : 'chevronLeft'} />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -125,7 +176,7 @@ export default function PageLayout(props: Props) {
           </div>
 
           {user && (
-            <div className={styles.profile}>
+            <div className={styles.profile} title={isCollapsed ? user.name : undefined}>
               <Avatar name={user.name} size={36} />
               <div className={styles.profileText}>
                 <span className={styles.profileName}>{user.name}</span>
@@ -150,13 +201,18 @@ export default function PageLayout(props: Props) {
           </nav>
 
           <div className={styles.theme}>
-            <ThemeSwitch />
+            <ThemeSwitch compact={isCollapsed} />
           </div>
 
           {user && (
-            <button type="button" className={styles.navLink} onClick={() => logout().then(() => replace('/login'))}>
+            <button
+              type="button"
+              className={styles.navLink}
+              onClick={() => logout().then(() => replace('/login'))}
+              title={isCollapsed ? 'Log out' : undefined}
+            >
               <Icon name="logout" />
-              Log out
+              <span className={styles.navLabel}>Log out</span>
             </button>
           )}
         </aside>

@@ -986,8 +986,7 @@ export default function TicketTimelineSheet(props: Props) {
               </th>
               <th>
                 Start
-                {/* A revision just added shows "Not started" here */}
-                {sizer(...widestDays, <span className={styles.end}>Not started</span>)}
+                {sizer(...widestDays)}
               </th>
               <th>
                 End
@@ -1008,7 +1007,8 @@ export default function TicketTimelineSheet(props: Props) {
                 </th>
               ))}
               <th className={styles.time} title="Times a review sent the ticket back">
-                Revisions
+                {/* Can break as "Revi-/sions" when the table is short of room */}
+                Revi&shy;sions
               </th>
               <th className={styles.num}>
                 Total
@@ -1472,21 +1472,26 @@ export default function TicketTimelineSheet(props: Props) {
                       {/* Empty, but holds the Status column so the values below line up */}
                       <td className={`${styles.blank} ${styles.status}`} />
                       {/* The round's first and last day worked, and when it began */}
-                      <td className={styles.dates} data-label="Start">
-                        {/* A revision just started has no time, so no days yet */}
-                        {r.firstDay ? (
-                          <span title={formatDay(r.firstDay)}>{formatShortDay(r.firstDay)}</span>
-                        ) : (
+                      {r.firstDay ? (
+                        <>
+                          <td className={styles.dates} data-label="Start">
+                            <span title={formatDay(r.firstDay)}>{formatShortDay(r.firstDay)}</span>
+                          </td>
+                          <td className={styles.dates} data-label="Last worked">
+                            {r.lastDay && r.lastDay !== r.firstDay && (
+                              <span className={styles.end} title={formatDay(r.lastDay)}>
+                                {formatShortDay(r.lastDay)}
+                              </span>
+                            )}
+                          </td>
+                        </>
+                      ) : (
+                        // A revision just started has no time, so no days yet: the
+                        // note spans Start and End, so Start stays as narrow as a date
+                        <td className={styles.dates} colSpan={2} data-label="Start">
                           <span className={styles.end}>Not started</span>
-                        )}
-                      </td>
-                      <td className={styles.dates} data-label="Last worked">
-                        {r.lastDay && r.lastDay !== r.firstDay && (
-                          <span className={styles.end} title={formatDay(r.lastDay)}>
-                            {formatShortDay(r.lastDay)}
-                          </span>
-                        )}
-                      </td>
+                        </td>
+                      )}
                       {startedAtCell(r.startedAt)}
                       {phases.map((p) => phaseCell(t, r.round, p.value, p.label, r.phaseHours[p.value] ?? 0))}
                       <td className={styles.blank} />

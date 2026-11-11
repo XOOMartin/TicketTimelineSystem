@@ -18,13 +18,16 @@
   background: var(--sidebar);
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  transition:
+    width 0.2s ease,
+    padding 0.2s ease;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px;
+  gap: 8px;
+  padding: 0 0 0 8px;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -47,6 +50,76 @@
 .closeNav {
   display: none !important;
   margin-left: auto;
+}
+
+/* Collapses the sidebar to its icons (wide screens only) */
+.collapseNav {
+  flex: none;
+  width: 28px !important;
+  height: 28px !important;
+  /* Tucked into the corner, so the name beside it isn't cut off */
+  margin: 0 -6px 0 auto;
+  color: var(--text-muted);
+}
+
+.brandName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapsed: a rail of icons, each named on hover, so the page gets the
+   width (the timeline table needs it to show every column) */
+@media (min-width: 961px) {
+  .collapsed {
+    width: 72px;
+    padding-inline: 12px;
+  }
+
+  .collapsed .brand {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .collapsed .collapseNav {
+    margin: 0;
+  }
+
+  .collapsed .brandName,
+  .collapsed .navLabel,
+  .collapsed .profileText {
+    display: none;
+  }
+
+  .collapsed .profile {
+    justify-content: center;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  /* Section names become thin dividers between the groups of icons */
+  .collapsed .navTitle {
+    height: 1px;
+    margin: 10px 6px;
+    overflow: hidden;
+    background: var(--border);
+    color: transparent;
+    font-size: 0;
+  }
+
+  .collapsed .navTitle:first-child {
+    display: none;
+  }
+
+  .collapsed .navLink {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .collapsed .theme {
+    margin-inline: 0;
+  }
 }
 
 .profile {
@@ -211,6 +284,11 @@
   .closeNav,
   .menu {
     display: inline-flex !important;
+  }
+
+  /* The sidebar slides in over the page here instead */
+  .collapseNav {
+    display: none !important;
   }
 
   .topbar {

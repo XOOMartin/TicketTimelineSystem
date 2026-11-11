@@ -163,6 +163,16 @@ export default function Timeline() {
     if (isReady && queryWeek) setWeek(queryWeek)
   }, [isReady, queryWeek, setWeek])
 
+  // Opened from the dashboard's Input timeline, as
+  // /timeline?week=2026-11-02&input=1: open Input timeline here
+  const wantsInput = query.input === '1'
+  useEffect(() => {
+    if (!isReady || !wantsInput) return
+    setIsEntering(true)
+    // Drop the query so a reload doesn't reopen the form
+    replace('/timeline', undefined, { shallow: true })
+  }, [isReady, wantsInput, replace])
+
   useEffect(() => {
     // Wait for the requested week's data, not the default week's
     if (!(editKey || openKey) || !data || (queryWeek && data.period.first !== queryWeek)) return

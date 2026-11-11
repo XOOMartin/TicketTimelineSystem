@@ -230,7 +230,7 @@
 
 .sheet th,
 .sheet td {
-  padding: 14px 8px;
+  padding: 14px 6px;
   border-bottom: 1px solid var(--border);
   text-align: left;
   vertical-align: middle;
@@ -247,7 +247,7 @@
 
 /* Section names above the columns, each underlined across its columns */
 .sheet .groups th {
-  padding: 10px 8px 0;
+  padding: 10px 6px 0;
   border-bottom: none;
   color: var(--text);
   white-space: nowrap;
@@ -416,8 +416,8 @@
 
 /* Plain icons, so a column of them doesn't crowd the numbers */
 .rowAction {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: var(--text-muted);
 }
 
@@ -436,7 +436,7 @@
    rather than taking the width the phases need. */
 .ticket {
   width: 26%;
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .ticketLine {
@@ -531,7 +531,7 @@
 .pill {
   display: inline-block;
   min-width: 44px;
-  padding: 3px 7px;
+  padding: 3px 6px;
   border-radius: 999px;
   color: var(--text);
   font-size: 0.85rem;
@@ -692,9 +692,11 @@
   min-width: 3px;
 }
 
-/* Not enough room for every column (with Start, Edit and Delete the table
-   needs about 1060px): one card per ticket, rather than scrolling sideways */
-@container sheet (max-width: 1080px) {
+/* Not enough room for every column (with the timer, every phase, Edit and
+   Delete the table needs about 1270px, measured): one card per ticket, never
+   a sideways scroll. Collapsing the sidebar gives the table that room on a
+   1440px-wide screen. Keep the five 1284px breakpoints below in step. */
+@container sheet (max-width: 1284px) {
   .sheet thead {
     display: none;
   }
@@ -914,7 +916,7 @@
 
 /* Cards (narrow screens): no columns to keep, and each value has its label
    above it, so the box sits where the value is, at a usable size */
-@container sheet (max-width: 1080px) {
+@container sheet (max-width: 1284px) {
   .cellInput,
   .cellSelect {
     top: auto;
@@ -1200,7 +1202,7 @@
 /* Keeps Edit and Delete lined up on a spec ticket, which has no + button */
 .rowActionSpace {
   display: inline-block;
-  width: 32px;
+  width: 28px;
 }
 
 /* When work began: the time of day, in the same tabular digits as the hours */
@@ -1209,7 +1211,7 @@
 }
 
 /* Cards: a ticket under a spec is shaded as one card, not cell by cell */
-@container sheet (max-width: 1080px) {
+@container sheet (max-width: 1284px) {
   .sheet tbody .childRow {
     background: color-mix(in srgb, var(--surface-2) 40%, transparent);
   }
@@ -1227,7 +1229,7 @@
 }
 
 /* Cards have no columns to keep: a closed breakdown's rows just go */
-@container sheet (max-width: 1080px) {
+@container sheet (max-width: 1284px) {
   .sheet tbody .collapsed {
     display: none !important;
   }
@@ -1249,7 +1251,7 @@
 }
 
 /* Cards (narrow screens) vary in height, so there's nothing to match */
-@container sheet (max-width: 1080px) {
+@container sheet (max-width: 1284px) {
   .sheet tbody .fillerRow {
     display: none;
   }
